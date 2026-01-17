@@ -1,0 +1,159 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "loading": "Chargement...",
+    "noData": "Aucune donnée disponible",
+    "actions": "Actions",
+    "status": "Statut",
+    "created": "Créé",
+    "updated": "Mis à jour",
+    "yes": "Oui",
+    "no": "Non",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "submit": "Soumettre",
+    "close": "Fermer"
+  },
+  "nav": {
+    "dashboard": "Tableau de Bord",
+    "assets": "Actifs",
+    "workOrders": "Ordres de Travail",
+    "preventiveMaintenance": "Maintenance Préventive",
+    "inventory": "Inventaire",
+    "reports": "Rapports",
+    "settings": "Paramètres",
+    "users": "Utilisateurs",
+    "logout": "Déconnexion"
+  },
+  "dashboard": {
+    "title": "Tableau de Bord",
+    "welcomeBack": "Bienvenue",
+    "openWorkOrders": "Ordres Ouverts",
+    "overdueOrders": "Ordres en Retard",
+    "assetsDown": "Actifs Hors Service",
+    "pmDueThisWeek": "MP Cette Semaine",
+    "recentActivity": "Activité Récente",
+    "quickStats": "Statistiques Rapides"
+  },
+  "assets": {
+    "title": "Actifs",
+    "addAsset": "Ajouter un Actif",
+    "assetName": "Nom de l'Actif",
+    "assetTag": "Étiquette de l'Actif",
+    "location": "Emplacement",
+    "category": "Catégorie",
+    "manufacturer": "Fabricant",
+    "model": "Modèle",
+    "serialNumber": "Numéro de Série",
+    "status": "Statut",
+    "statuses": {
+      "operational": "Opérationnel",
+      "maintenance": "En Maintenance",
+      "offline": "Hors Ligne",
+      "decommissioned": "Déclassé"
+    }
+  },
+  "workOrders": {
+    "title": "Ordres de Travail",
+    "createWorkOrder": "Créer un Ordre de Travail",
+    "workOrderNumber": "Ordre de Travail #",
+    "description": "Description",
+    "priority": "Priorité",
+    "assignedTo": "Assigné À",
+    "dueDate": "Date d'Échéance",
+    "estimatedHours": "Heures Estimées",
+    "actualHours": "Heures Réelles",
+    "priorities": {
+      "critical": "Critique",
+      "high": "Haute",
+      "medium": "Moyenne",
+      "low": "Basse"
+    },
+    "statuses": {
+      "open": "Ouvert",
+      "inProgress": "En Cours",
+      "onHold": "En Attente",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    }
+  },
+  "pm": {
+    "title": "Maintenance Préventive",
+    "createSchedule": "Créer un Programme",
+    "scheduleName": "Nom du Programme",
+    "frequency": "Fréquence",
+    "nextDue": "Prochaine Échéance",
+    "lastCompleted": "Dernier Achèvement",
+    "frequencies": {
+      "daily": "Quotidien",
+      "weekly": "Hebdomadaire",
+      "monthly": "Mensuel",
+      "quarterly": "Trimestriel",
+      "annually": "Annuel"
+    }
+  },
+  "inventory": {
+    "title": "Inventaire",
+    "addItem": "Ajouter un Article",
+    "partNumber": "Numéro de Pièce",
+    "itemName": "Nom de l'Article",
+    "quantity": "Quantité",
+    "minQuantity": "Quantité Minimum",
+    "maxQuantity": "Quantité Maximum",
+    "unitCost": "Coût Unitaire",
+    "supplier": "Fournisseur",
+    "restock": "Réapprovisionner",
+    "lowStock": "Stock Bas",
+    "outOfStock": "Rupture de Stock",
+    "inStock": "En Stock"
+  },
+  "reports": {
+    "title": "Rapports",
+    "kpiDashboard": "Tableau de Bord KPI",
+    "mtbf": "Temps Moyen Entre Pannes",
+    "mttr": "Temps Moyen de Réparation",
+    "oee": "Efficacité Globale des Équipements",
+    "pmCompliance": "Conformité MP"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "general": "Général",
+    "notifications": "Notifications",
+    "security": "Sécurité",
+    "integrations": "Intégrations",
+    "language": "Langue",
+    "timezone": "Fuseau Horaire",
+    "dateFormat": "Format de Date"
+  },
+  "auth": {
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "email": "E-mail",
+    "password": "Mot de Passe",
+    "forgotPassword": "Mot de Passe Oublié?",
+    "rememberMe": "Se Souvenir de Moi",
+    "signIn": "Se Connecter",
+    "signUp": "S'inscrire"
+  },
+  "errors": {
+    "required": "Ce champ est requis",
+    "invalidEmail": "Adresse e-mail invalide",
+    "passwordMin": "Le mot de passe doit contenir au moins 8 caractères",
+    "serverError": "Erreur serveur. Veuillez réessayer.",
+    "unauthorized": "Non autorisé. Veuillez vous reconnecter.",
+    "notFound": "Ressource non trouvée"
+  },
+  "notifications": {
+    "saveSuccess": "Enregistré avec succès",
+    "deleteSuccess": "Supprimé avec succès",
+    "updateSuccess": "Mis à jour avec succès",
+    "error": "Une erreur s'est produite"
+  }
+}

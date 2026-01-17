@@ -1,0 +1,159 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "loading": "Cargando...",
+    "noData": "No hay datos disponibles",
+    "actions": "Acciones",
+    "status": "Estado",
+    "created": "Creado",
+    "updated": "Actualizado",
+    "yes": "Si",
+    "no": "No",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "submit": "Enviar",
+    "close": "Cerrar"
+  },
+  "nav": {
+    "dashboard": "Panel de Control",
+    "assets": "Activos",
+    "workOrders": "Órdenes de Trabajo",
+    "preventiveMaintenance": "Mantenimiento Preventivo",
+    "inventory": "Inventario",
+    "reports": "Reportes",
+    "settings": "Configuración",
+    "users": "Usuarios",
+    "logout": "Cerrar Sesión"
+  },
+  "dashboard": {
+    "title": "Panel de Control",
+    "welcomeBack": "Bienvenido de nuevo",
+    "openWorkOrders": "Órdenes Abiertas",
+    "overdueOrders": "Órdenes Vencidas",
+    "assetsDown": "Activos Fuera de Servicio",
+    "pmDueThisWeek": "MP Esta Semana",
+    "recentActivity": "Actividad Reciente",
+    "quickStats": "Estadísticas Rápidas"
+  },
+  "assets": {
+    "title": "Activos",
+    "addAsset": "Agregar Activo",
+    "assetName": "Nombre del Activo",
+    "assetTag": "Etiqueta del Activo",
+    "location": "Ubicación",
+    "category": "Categoría",
+    "manufacturer": "Fabricante",
+    "model": "Modelo",
+    "serialNumber": "Número de Serie",
+    "status": "Estado",
+    "statuses": {
+      "operational": "Operacional",
+      "maintenance": "En Mantenimiento",
+      "offline": "Fuera de Línea",
+      "decommissioned": "Descomisionado"
+    }
+  },
+  "workOrders": {
+    "title": "Órdenes de Trabajo",
+    "createWorkOrder": "Crear Orden de Trabajo",
+    "workOrderNumber": "Orden de Trabajo #",
+    "description": "Descripción",
+    "priority": "Prioridad",
+    "assignedTo": "Asignado A",
+    "dueDate": "Fecha de Vencimiento",
+    "estimatedHours": "Horas Estimadas",
+    "actualHours": "Horas Reales",
+    "priorities": {
+      "critical": "Crítica",
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Baja"
+    },
+    "statuses": {
+      "open": "Abierta",
+      "inProgress": "En Progreso",
+      "onHold": "En Espera",
+      "completed": "Completada",
+      "cancelled": "Cancelada"
+    }
+  },
+  "pm": {
+    "title": "Mantenimiento Preventivo",
+    "createSchedule": "Crear Programa",
+    "scheduleName": "Nombre del Programa",
+    "frequency": "Frecuencia",
+    "nextDue": "Próximo Vencimiento",
+    "lastCompleted": "Último Completado",
+    "frequencies": {
+      "daily": "Diario",
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "quarterly": "Trimestral",
+      "annually": "Anual"
+    }
+  },
+  "inventory": {
+    "title": "Inventario",
+    "addItem": "Agregar Artículo",
+    "partNumber": "Número de Parte",
+    "itemName": "Nombre del Artículo",
+    "quantity": "Cantidad",
+    "minQuantity": "Cantidad Mínima",
+    "maxQuantity": "Cantidad Máxima",
+    "unitCost": "Costo Unitario",
+    "supplier": "Proveedor",
+    "restock": "Reabastecer",
+    "lowStock": "Stock Bajo",
+    "outOfStock": "Sin Stock",
+    "inStock": "En Stock"
+  },
+  "reports": {
+    "title": "Reportes",
+    "kpiDashboard": "Panel de KPIs",
+    "mtbf": "Tiempo Medio Entre Fallas",
+    "mttr": "Tiempo Medio de Reparación",
+    "oee": "Eficiencia General del Equipo",
+    "pmCompliance": "Cumplimiento de MP"
+  },
+  "settings": {
+    "title": "Configuración",
+    "general": "General",
+    "notifications": "Notificaciones",
+    "security": "Seguridad",
+    "integrations": "Integraciones",
+    "language": "Idioma",
+    "timezone": "Zona Horaria",
+    "dateFormat": "Formato de Fecha"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidó su Contraseña?",
+    "rememberMe": "Recordarme",
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse"
+  },
+  "errors": {
+    "required": "Este campo es requerido",
+    "invalidEmail": "Correo electrónico inválido",
+    "passwordMin": "La contraseña debe tener al menos 8 caracteres",
+    "serverError": "Error del servidor. Intente de nuevo.",
+    "unauthorized": "No autorizado. Inicie sesión de nuevo.",
+    "notFound": "Recurso no encontrado"
+  },
+  "notifications": {
+    "saveSuccess": "Guardado exitosamente",
+    "deleteSuccess": "Eliminado exitosamente",
+    "updateSuccess": "Actualizado exitosamente",
+    "error": "Ocurrió un error"
+  }
+}

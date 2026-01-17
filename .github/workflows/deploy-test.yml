@@ -1,0 +1,148 @@
+name: Deploy Frontend to Test Environment
+
+on:
+  push:
+    branches:
+      - develop
+      - test
+    paths:
+      - 'maintenance-frontend/**'
+  pull_request:
+    branches:
+      - develop
+      - test
+    paths:
+      - 'maintenance-frontend/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+          - test
+          - staging
+
+env:
+  NODE_VERSION: '20'
+  WORKING_DIRECTORY: ./maintenance-frontend
+
+jobs:
+  build:
+    name: Build Frontend
+    runs-on: product-server-dev
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Build application
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.TEST_API_URL }}
+          VITE_APP_ENV: test
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-${{ github.sha }}
+          path: ${{ env.WORKING_DIRECTORY }}/dist
+          retention-days: 7
+
+  deploy:
+    name: Deploy to Test Server
+    needs: build
+    runs-on: product-server-dev
+    environment: test
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build-${{ github.sha }}
+          path: ./dist
+
+      - name: Deploy to test server
+        run: |
+          echo "Deploying frontend to test environment..."
+
+          # Define deployment directory
+          DEPLOY_DIR=${{ secrets.TEST_FRONTEND_DEPLOY_PATH }}
+
+          # Backup current deployment
+          if [ -d "$DEPLOY_DIR" ]; then
+            BACKUP_DIR="${DEPLOY_DIR}_backup_$(date +%Y%m%d_%H%M%S)"
+            echo "Creating backup at $BACKUP_DIR"
+            cp -r "$DEPLOY_DIR" "$BACKUP_DIR"
+          fi
+
+          # Create deployment directory if it doesn't exist
+          mkdir -p "$DEPLOY_DIR"
+
+          # Copy new build files
+          cp -r ./dist/* "$DEPLOY_DIR/"
+
+          echo "Frontend deployment completed successfully!"
+
+      - name: Verify deployment
+        run: |
+          echo "Verifying deployment..."
+          DEPLOY_DIR=${{ secrets.TEST_FRONTEND_DEPLOY_PATH }}
+
+          if [ -f "$DEPLOY_DIR/index.html" ]; then
+            echo "Deployment verification passed - index.html exists"
+          else
+            echo "Deployment verification failed - index.html not found"
+            exit 1
+          fi
+
+      - name: Cleanup old backups
+        run: |
+          DEPLOY_DIR=${{ secrets.TEST_FRONTEND_DEPLOY_PATH }}
+          BACKUP_PATTERN="${DEPLOY_DIR}_backup_*"
+
+          # Keep only last 3 backups
+          ls -dt $BACKUP_PATTERN 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
+          echo "Backup cleanup completed"
+
+  notify:
+    name: Send Notification
+    needs: [build, deploy]
+    runs-on: product-server-dev
+    if: always()
+
+    steps:
+      - name: Notify on success
+        if: ${{ needs.deploy.result == 'success' }}
+        run: |
+          echo "Frontend deployment to TEST environment completed successfully!"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Triggered by: ${{ github.actor }}"
+
+      - name: Notify on failure
+        if: ${{ needs.deploy.result == 'failure' }}
+        run: |
+          echo "Frontend deployment to TEST environment FAILED!"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Please check the workflow logs for details."
+          exit 1

@@ -1,0 +1,159 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "actions": "Actions",
+    "status": "Status",
+    "created": "Created",
+    "updated": "Updated",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "close": "Close"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "assets": "Assets",
+    "workOrders": "Work Orders",
+    "preventiveMaintenance": "Preventive Maintenance",
+    "inventory": "Inventory",
+    "reports": "Reports",
+    "settings": "Settings",
+    "users": "Users",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcomeBack": "Welcome back",
+    "openWorkOrders": "Open Work Orders",
+    "overdueOrders": "Overdue Orders",
+    "assetsDown": "Assets Down",
+    "pmDueThisWeek": "PM Due This Week",
+    "recentActivity": "Recent Activity",
+    "quickStats": "Quick Stats"
+  },
+  "assets": {
+    "title": "Assets",
+    "addAsset": "Add Asset",
+    "assetName": "Asset Name",
+    "assetTag": "Asset Tag",
+    "location": "Location",
+    "category": "Category",
+    "manufacturer": "Manufacturer",
+    "model": "Model",
+    "serialNumber": "Serial Number",
+    "status": "Status",
+    "statuses": {
+      "operational": "Operational",
+      "maintenance": "Under Maintenance",
+      "offline": "Offline",
+      "decommissioned": "Decommissioned"
+    }
+  },
+  "workOrders": {
+    "title": "Work Orders",
+    "createWorkOrder": "Create Work Order",
+    "workOrderNumber": "Work Order #",
+    "description": "Description",
+    "priority": "Priority",
+    "assignedTo": "Assigned To",
+    "dueDate": "Due Date",
+    "estimatedHours": "Estimated Hours",
+    "actualHours": "Actual Hours",
+    "priorities": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "statuses": {
+      "open": "Open",
+      "inProgress": "In Progress",
+      "onHold": "On Hold",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "pm": {
+    "title": "Preventive Maintenance",
+    "createSchedule": "Create Schedule",
+    "scheduleName": "Schedule Name",
+    "frequency": "Frequency",
+    "nextDue": "Next Due",
+    "lastCompleted": "Last Completed",
+    "frequencies": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "quarterly": "Quarterly",
+      "annually": "Annually"
+    }
+  },
+  "inventory": {
+    "title": "Inventory",
+    "addItem": "Add Item",
+    "partNumber": "Part Number",
+    "itemName": "Item Name",
+    "quantity": "Quantity",
+    "minQuantity": "Min Quantity",
+    "maxQuantity": "Max Quantity",
+    "unitCost": "Unit Cost",
+    "supplier": "Supplier",
+    "restock": "Restock",
+    "lowStock": "Low Stock",
+    "outOfStock": "Out of Stock",
+    "inStock": "In Stock"
+  },
+  "reports": {
+    "title": "Reports",
+    "kpiDashboard": "KPI Dashboard",
+    "mtbf": "Mean Time Between Failures",
+    "mttr": "Mean Time To Repair",
+    "oee": "Overall Equipment Effectiveness",
+    "pmCompliance": "PM Compliance Rate"
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "notifications": "Notifications",
+    "security": "Security",
+    "integrations": "Integrations",
+    "language": "Language",
+    "timezone": "Timezone",
+    "dateFormat": "Date Format"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember Me",
+    "signIn": "Sign In",
+    "signUp": "Sign Up"
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordMin": "Password must be at least 8 characters",
+    "serverError": "Server error. Please try again.",
+    "unauthorized": "Unauthorized. Please login again.",
+    "notFound": "Resource not found"
+  },
+  "notifications": {
+    "saveSuccess": "Saved successfully",
+    "deleteSuccess": "Deleted successfully",
+    "updateSuccess": "Updated successfully",
+    "error": "An error occurred"
+  }
+}

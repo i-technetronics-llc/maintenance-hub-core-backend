@@ -1,0 +1,129 @@
+# ===========================================
+# Ignore everything except maintenance-backend, maintenance-frontend, and .github
+# ===========================================
+/*
+!maintenance-backend/
+!maintenance-frontend/
+!.github/
+!.gitignore
+
+# ===========================================
+# Dependencies
+# ===========================================
+**/node_modules/
+**/.pnp
+**/.pnp.js
+
+# ===========================================
+# Build outputs
+# ===========================================
+**/dist/
+**/build/
+**/out/
+**/out-tsc/
+**/.next/
+**/.nuxt/
+**/.output/
+**/tmp/
+**/temp/
+
+# ===========================================
+# Environment files - NEVER COMMIT THESE
+# ===========================================
+**/.env
+**/.env.local
+**/.env.development
+**/.env.development.local
+**/.env.test
+**/.env.test.local
+**/.env.production
+**/.env.production.local
+**/.env.staging
+**/.env.*.local
+
+# ===========================================
+# Logs
+# ===========================================
+**/logs/
+**/*.log
+**/npm-debug.log*
+**/pnpm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/lerna-debug.log*
+
+# ===========================================
+# Testing
+# ===========================================
+**/coverage/
+**/.nyc_output/
+**/.vitest/
+
+# ===========================================
+# IDE and Editor files
+# ===========================================
+**/.idea/
+**/.vscode/*
+!**/.vscode/settings.json
+!**/.vscode/tasks.json
+!**/.vscode/launch.json
+!**/.vscode/extensions.json
+**/*.sublime-workspace
+**/*.sublime-project
+**/.project
+**/.classpath
+**/.c9/
+**/*.launch
+**/.settings/
+
+# ===========================================
+# OS generated files
+# ===========================================
+**/.DS_Store
+**/.DS_Store?
+**/._*
+**/.Spotlight-V100
+**/.Trashes
+**/ehthumbs.db
+**/Thumbs.db
+**/Desktop.ini
+
+# ===========================================
+# Secrets and credentials
+# ===========================================
+**/*.pem
+**/*.key
+**/*.cert
+**/*.p12
+**/*.pfx
+**/secrets/
+**/credentials/
+**/.secrets/
+**/service-account*.json
+
+# ===========================================
+# Uploads and user generated content
+# ===========================================
+**/uploads/
+**/temp/
+**/tmp/
+
+# ===========================================
+# Debug files
+# ===========================================
+**/*.tsbuildinfo
+**/.eslintcache
+**/.stylelintcache
+
+# ===========================================
+# Package manager lock files (keep package-lock.json, ignore others if not used)
+# ===========================================
+# Uncomment if you want to ignore these:
+# **/yarn.lock
+# **/pnpm-lock.yaml
+
+# ===========================================
+# Misc
+# ===========================================
+**/nul
+**/*.local
