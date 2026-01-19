@@ -14,23 +14,9 @@ async function bootstrap() {
   // Replace default logger with Pino
   app.useLogger(app.get(Logger));
 
-  // Enable CORS with comprehensive configuration
-  const corsOrigin = configService.get<string>('CORS_ORIGIN');
-  const allowedOrigins = corsOrigin ? corsOrigin.split(',').map(o => o.trim()) : [];
-
+  // Enable CORS - allow all origins
   app.enableCors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, curl, etc.)
-      if (!origin) {
-        return callback(null, true);
-      }
-      // Check if origin is in allowed list or allow all in development
-      if (allowedOrigins.length === 0 || allowedOrigins.includes(origin) || origin.startsWith('http://localhost')) {
-        return callback(null, true);
-      }
-      callback(new Error('Not allowed by CORS'));
-    },
-    credentials: true,
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
     allowedHeaders: [
       'Content-Type',
@@ -85,7 +71,7 @@ async function bootstrap() {
   }
 
   // Start server
-  const port = configService.get<number>('APP_PORT', 3000);
+  const port = configService.get<number>('APP_PORT', 4001);
   await app.listen(port);
 
   console.log(`\n🚀 Application is running on: http://localhost:${port}${apiPrefix}\n`);

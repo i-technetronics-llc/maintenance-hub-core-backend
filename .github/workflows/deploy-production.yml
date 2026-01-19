@@ -1,4 +1,4 @@
-name: Deploy Backend to Production
+name: Deploy to Production Environment
 
 on:
   push:
@@ -6,23 +6,11 @@ on:
       - main
       - master
     paths:
+      - 'maintenance-frontend/**'
       - 'maintenance-backend/**'
   release:
     types: [published]
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Deployment environment'
-        required: true
-        default: 'production'
-        type: choice
-        options:
-          - production
-          - staging
-
-env:
-  NODE_VERSION: '20'
-  WORKING_DIRECTORY: ./maintenance-backend
 
 jobs:
   test:
@@ -30,7 +18,7 @@ jobs:
     runs-on: product-server-dev
     defaults:
       run:
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+        working-directory: ./maintenance-backend
 
     steps:
       - name: Checkout repository
@@ -39,9 +27,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 20
           cache: 'npm'
-          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
+          cache-dependency-path: ./maintenance-backend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -56,13 +44,13 @@ jobs:
         env:
           NODE_ENV: test
 
-  build:
-    name: Build Backend
+  build-frontend:
+    name: Build Frontend
     needs: test
     runs-on: product-server-dev
     defaults:
       run:
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+        working-directory: ./maintenance-frontend
 
     steps:
       - name: Checkout repository
@@ -71,9 +59,50 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 20
           cache: 'npm'
-          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
+          cache-dependency-path: ./maintenance-frontend/package-lock.json
+
+      - name: Create frontend environment file
+        run: |
+          echo "${{ secrets.ENV_FILE_FE_PROD }}" > .env.production
+          echo "Frontend environment file created"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Build application
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: ./maintenance-frontend/dist
+          retention-days: 7
+
+  build-backend:
+    name: Build Backend
+    needs: test
+    runs-on: product-server-dev
+    defaults:
+      run:
+        working-directory: ./maintenance-backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: ./maintenance-backend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -84,17 +113,17 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: backend-build-${{ github.sha }}
+          name: backend-build
           path: |
-            ${{ env.WORKING_DIRECTORY }}/dist
-            ${{ env.WORKING_DIRECTORY }}/package.json
-            ${{ env.WORKING_DIRECTORY }}/package-lock.json
-            ${{ env.WORKING_DIRECTORY }}/nest-cli.json
+            ./maintenance-backend/dist
+            ./maintenance-backend/package.json
+            ./maintenance-backend/package-lock.json
+            ./maintenance-backend/nest-cli.json
           retention-days: 7
 
-  deploy:
-    name: Deploy to Production Server
-    needs: build
+  deploy-frontend:
+    name: Deploy Frontend to Production
+    needs: build-frontend
     runs-on: product-server-dev
     environment: production
 
@@ -102,41 +131,84 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: backend-build-${{ github.sha }}
-          path: ./backend-build
+          name: frontend-build
+          path: ./dist
 
-      - name: Pre-deployment checks
+      - name: Backup current deployment
         run: |
-          echo "Running pre-deployment checks..."
+          DEPLOY_DIR=/var/www/maintenance-frontend
 
-          # Check if deployment directory exists
-          DEPLOY_DIR=${{ secrets.PROD_BACKEND_DEPLOY_PATH }}
-          if [ -z "$DEPLOY_DIR" ]; then
-            echo "Error: PROD_BACKEND_DEPLOY_PATH secret is not set"
+          if [ -d "$DEPLOY_DIR" ]; then
+            BACKUP_DIR="${DEPLOY_DIR}_backup_$(date +%Y%m%d_%H%M%S)"
+            echo "Creating backup at $BACKUP_DIR"
+            cp -r "$DEPLOY_DIR" "$BACKUP_DIR"
+            echo "Backup created successfully"
+          else
+            echo "No existing deployment to backup"
+          fi
+
+      - name: Deploy to production server
+        run: |
+          echo "Deploying frontend to production environment..."
+
+          DEPLOY_DIR=/var/www/maintenance-frontend
+
+          # Create deployment directory if it doesn't exist
+          mkdir -p "$DEPLOY_DIR"
+
+          # Copy new build files
+          cp -r ./dist/* "$DEPLOY_DIR/"
+
+          echo "Frontend deployment completed successfully!"
+
+      - name: Verify deployment
+        run: |
+          echo "Verifying deployment..."
+          DEPLOY_DIR=/var/www/maintenance-frontend
+
+          if [ -f "$DEPLOY_DIR/index.html" ]; then
+            echo "Deployment verification passed - index.html exists"
+          else
+            echo "Deployment verification failed - index.html not found"
             exit 1
           fi
 
-          echo "Pre-deployment checks passed"
+      - name: Cleanup old backups
+        run: |
+          DEPLOY_DIR=/var/www/maintenance-frontend
+          BACKUP_PATTERN="${DEPLOY_DIR}_backup_*"
+
+          # Keep only last 5 backups for production
+          ls -dt $BACKUP_PATTERN 2>/dev/null | tail -n +6 | xargs rm -rf 2>/dev/null || true
+          echo "Backup cleanup completed"
+
+  deploy-backend:
+    name: Deploy Backend to Production
+    needs: build-backend
+    runs-on: product-server-dev
+    environment: production
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-build
+          path: ./backend-build
 
       - name: Stop existing application
         run: |
           echo "Stopping existing application..."
-          DEPLOY_DIR=${{ secrets.PROD_BACKEND_DEPLOY_PATH }}
-          APP_NAME=${{ secrets.PROD_APP_NAME || 'maintenance-backend' }}
+          APP_NAME=maintenance-backend
 
-          # Stop using PM2 if available
           if command -v pm2 &> /dev/null; then
             pm2 stop "$APP_NAME" 2>/dev/null || echo "Application was not running"
           fi
-
-          # Alternative: Stop using systemd
-          # sudo systemctl stop $APP_NAME 2>/dev/null || echo "Service was not running"
 
           echo "Application stopped"
 
       - name: Backup current deployment
         run: |
-          DEPLOY_DIR=${{ secrets.PROD_BACKEND_DEPLOY_PATH }}
+          DEPLOY_DIR=/var/www/maintenance-backend
 
           if [ -d "$DEPLOY_DIR" ]; then
             BACKUP_DIR="${DEPLOY_DIR}_backup_$(date +%Y%m%d_%H%M%S)"
@@ -151,7 +223,7 @@ jobs:
         run: |
           echo "Deploying backend to production..."
 
-          DEPLOY_DIR=${{ secrets.PROD_BACKEND_DEPLOY_PATH }}
+          DEPLOY_DIR=/var/www/maintenance-backend
 
           # Create deployment directory if it doesn't exist
           mkdir -p "$DEPLOY_DIR"
@@ -163,68 +235,36 @@ jobs:
 
       - name: Install production dependencies
         run: |
-          DEPLOY_DIR=${{ secrets.PROD_BACKEND_DEPLOY_PATH }}
+          DEPLOY_DIR=/var/www/maintenance-backend
           cd "$DEPLOY_DIR"
 
-          # Install only production dependencies
           npm ci --only=production
 
           echo "Production dependencies installed"
 
-      - name: Setup environment
+      - name: Setup environment from ENV_FILE_BE_PROD
         run: |
-          DEPLOY_DIR=${{ secrets.PROD_BACKEND_DEPLOY_PATH }}
+          DEPLOY_DIR=/var/www/maintenance-backend
 
-          # Create production .env file from secrets
-          cat > "$DEPLOY_DIR/.env.production" << EOF
-          NODE_ENV=production
-          PORT=${{ secrets.PROD_PORT || '3000' }}
-          DATABASE_HOST=${{ secrets.PROD_DATABASE_HOST }}
-          DATABASE_PORT=${{ secrets.PROD_DATABASE_PORT }}
-          DATABASE_NAME=${{ secrets.PROD_DATABASE_NAME }}
-          DATABASE_USER=${{ secrets.PROD_DATABASE_USER }}
-          DATABASE_PASSWORD=${{ secrets.PROD_DATABASE_PASSWORD }}
-          JWT_SECRET=${{ secrets.PROD_JWT_SECRET }}
-          JWT_EXPIRES_IN=${{ secrets.PROD_JWT_EXPIRES_IN || '1d' }}
-          REDIS_HOST=${{ secrets.PROD_REDIS_HOST }}
-          REDIS_PORT=${{ secrets.PROD_REDIS_PORT || '6379' }}
-          SMTP_HOST=${{ secrets.PROD_SMTP_HOST }}
-          SMTP_PORT=${{ secrets.PROD_SMTP_PORT }}
-          SMTP_USER=${{ secrets.PROD_SMTP_USER }}
-          SMTP_PASS=${{ secrets.PROD_SMTP_PASS }}
-          EOF
+          # Create .env.production file from ENV_FILE_BE_PROD secret
+          echo "${{ secrets.ENV_FILE_BE_PROD }}" > "$DEPLOY_DIR/.env.production"
 
-          echo "Environment configured"
-
-      - name: Run database migrations
-        run: |
-          DEPLOY_DIR=${{ secrets.PROD_BACKEND_DEPLOY_PATH }}
-          cd "$DEPLOY_DIR"
-
-          # Run migrations if enabled
-          if [ "${{ secrets.RUN_MIGRATIONS }}" = "true" ]; then
-            echo "Running database migrations..."
-            npm run migrate || echo "Migration completed or skipped"
-          else
-            echo "Migrations skipped (RUN_MIGRATIONS is not set to true)"
-          fi
+          echo "Environment configured from ENV_FILE_BE_PROD"
 
       - name: Start application
         run: |
           echo "Starting application..."
-          DEPLOY_DIR=${{ secrets.PROD_BACKEND_DEPLOY_PATH }}
-          APP_NAME=${{ secrets.PROD_APP_NAME || 'maintenance-backend' }}
+          DEPLOY_DIR=/var/www/maintenance-backend
+          APP_NAME=maintenance-backend
 
           cd "$DEPLOY_DIR"
 
-          # Start using PM2
           if command -v pm2 &> /dev/null; then
             pm2 delete "$APP_NAME" 2>/dev/null || true
             pm2 start dist/apps/api-gateway/main.js --name "$APP_NAME" --env production
             pm2 save
             echo "Application started with PM2"
           else
-            # Alternative: Start in background
             nohup node dist/apps/api-gateway/main.js > /dev/null 2>&1 &
             echo "Application started in background"
           fi
@@ -234,9 +274,8 @@ jobs:
           echo "Running health check..."
           sleep 10
 
-          HEALTH_URL="${{ secrets.PROD_HEALTH_CHECK_URL || 'http://localhost:3000/health' }}"
+          HEALTH_URL="http://localhost:4001/api/v1/health"
 
-          # Retry health check up to 5 times
           for i in {1..5}; do
             if curl -sf "$HEALTH_URL" > /dev/null 2>&1; then
               echo "Health check passed!"
@@ -251,7 +290,7 @@ jobs:
 
       - name: Cleanup old backups
         run: |
-          DEPLOY_DIR=${{ secrets.PROD_BACKEND_DEPLOY_PATH }}
+          DEPLOY_DIR=/var/www/maintenance-backend
           BACKUP_PATTERN="${DEPLOY_DIR}_backup_*"
 
           # Keep only last 5 backups for production
@@ -260,17 +299,17 @@ jobs:
 
   rollback:
     name: Rollback on Failure
-    needs: deploy
+    needs: [deploy-frontend, deploy-backend]
     runs-on: product-server-dev
     if: failure()
 
     steps:
-      - name: Rollback to previous version
+      - name: Rollback backend to previous version
         run: |
-          echo "Deployment failed! Initiating rollback..."
+          echo "Deployment failed! Initiating backend rollback..."
 
-          DEPLOY_DIR=${{ secrets.PROD_BACKEND_DEPLOY_PATH }}
-          APP_NAME=${{ secrets.PROD_APP_NAME || 'maintenance-backend' }}
+          DEPLOY_DIR=/var/www/maintenance-backend
+          APP_NAME=maintenance-backend
 
           # Find the most recent backup
           LATEST_BACKUP=$(ls -dt ${DEPLOY_DIR}_backup_* 2>/dev/null | head -1)
@@ -290,39 +329,53 @@ jobs:
             pm2 start dist/apps/api-gateway/main.js --name "$APP_NAME" --env production 2>/dev/null || \
               nohup node dist/apps/api-gateway/main.js > /dev/null 2>&1 &
 
-            echo "Rollback completed"
+            echo "Backend rollback completed"
           else
             echo "No backup found for rollback!"
-            exit 1
+          fi
+
+      - name: Rollback frontend to previous version
+        run: |
+          echo "Initiating frontend rollback..."
+
+          DEPLOY_DIR=/var/www/maintenance-frontend
+
+          # Find the most recent backup
+          LATEST_BACKUP=$(ls -dt ${DEPLOY_DIR}_backup_* 2>/dev/null | head -1)
+
+          if [ -n "$LATEST_BACKUP" ] && [ -d "$LATEST_BACKUP" ]; then
+            echo "Rolling back to: $LATEST_BACKUP"
+
+            # Restore backup
+            rm -rf "$DEPLOY_DIR"
+            cp -r "$LATEST_BACKUP" "$DEPLOY_DIR"
+
+            echo "Frontend rollback completed"
+          else
+            echo "No backup found for rollback!"
           fi
 
   notify:
     name: Send Notification
-    needs: [test, build, deploy]
+    needs: [test, build-frontend, build-backend, deploy-frontend, deploy-backend]
     runs-on: product-server-dev
     if: always()
 
     steps:
       - name: Notify on success
-        if: ${{ needs.deploy.result == 'success' }}
+        if: needs.deploy-frontend.result == 'success' && needs.deploy-backend.result == 'success'
         run: |
           echo "=========================================="
-          echo "Backend deployment to PRODUCTION completed successfully!"
+          echo "Deployment to PRODUCTION completed successfully!"
           echo "=========================================="
-          echo "Commit: ${{ github.sha }}"
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Triggered by: ${{ github.actor }}"
           echo "Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
 
       - name: Notify on failure
-        if: ${{ needs.deploy.result == 'failure' }}
+        if: needs.deploy-frontend.result == 'failure' || needs.deploy-backend.result == 'failure'
         run: |
           echo "=========================================="
-          echo "Backend deployment to PRODUCTION FAILED!"
+          echo "Deployment to PRODUCTION FAILED!"
           echo "=========================================="
-          echo "Commit: ${{ github.sha }}"
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Triggered by: ${{ github.actor }}"
           echo "Please check the workflow logs for details."
           echo "Rollback may have been initiated automatically."
           exit 1
