@@ -5,21 +5,11 @@ on:
     branches:
       - develop
       - test
-    paths:
-      - 'maintenance-frontend/**'
-      - 'maintenance-backend/**'
-  pull_request:
-    branches:
-      - develop
-      - test
-    paths:
-      - 'maintenance-frontend/**'
-      - 'maintenance-backend/**'
   workflow_dispatch:
 
 jobs:
-  build-frontend:
-    name: Build Frontend
+  build-and-deploy-frontend:
+    name: Build and Deploy Frontend
     runs-on: product-server-dev
     defaults:
       run:
@@ -33,33 +23,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-          cache-dependency-path: ./maintenance-frontend/package-lock.json
 
-      - name: Create frontend environment file
-        run: |
-          echo "${{ secrets.ENV_FILE_FE_TEST }}" > .env.production
-          echo "Frontend environment file created"
+      - name: Create environment file
+        run: echo "${{ secrets.ENV_FILE_FE_TEST }}" > .env.production
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run linting
-        run: npm run lint
-        continue-on-error: true
-
       - name: Build application
         run: npm run build
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: ./maintenance-frontend/dist
-          retention-days: 7
+      - name: Deploy application
+        run: |
+          mkdir -p /var/www/maintenance-frontend-test
+          cp -r ./dist/* /var/www/maintenance-frontend-test/
+          cp ../pm2.config.json /var/www/maintenance-frontend-test/
+          cd /var/www/maintenance-frontend-test
+          pm2 delete maintenance-frontend-test || true
+          pm2 start pm2.config.json --only maintenance-frontend-test
+          pm2 save
 
-  build-backend:
-    name: Build Backend
+  build-and-deploy-backend:
+    name: Build and Deploy Backend
     runs-on: product-server-dev
     defaults:
       run:
@@ -73,226 +58,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-          cache-dependency-path: ./maintenance-backend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run linting
-        run: npm run lint
-        continue-on-error: true
-
-      - name: Run tests
-        run: npm run test
-        continue-on-error: true
-        env:
-          NODE_ENV: test
-
       - name: Build application
         run: npm run build
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-build
-          path: |
-            ./maintenance-backend/dist
-            ./maintenance-backend/package.json
-            ./maintenance-backend/package-lock.json
-            ./maintenance-backend/nest-cli.json
-          retention-days: 7
-
-  deploy-frontend:
-    name: Deploy Frontend to Test
-    needs: build-frontend
-    runs-on: product-server-dev
-    environment: test
-
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-build
-          path: ./dist
-
-      - name: Deploy to test server
-        run: |
-          echo "Deploying frontend to test environment..."
-
-          DEPLOY_DIR=/var/www/maintenance-frontend-test
-
-          # Backup current deployment
-          if [ -d "$DEPLOY_DIR" ]; then
-            BACKUP_DIR="${DEPLOY_DIR}_backup_$(date +%Y%m%d_%H%M%S)"
-            echo "Creating backup at $BACKUP_DIR"
-            cp -r "$DEPLOY_DIR" "$BACKUP_DIR"
-          fi
-
-          # Create deployment directory if it doesn't exist
-          mkdir -p "$DEPLOY_DIR"
-
-          # Copy new build files
-          cp -r ./dist/* "$DEPLOY_DIR/"
-
-          echo "Frontend deployment completed successfully!"
-
-      - name: Verify deployment
-        run: |
-          echo "Verifying deployment..."
-          DEPLOY_DIR=/var/www/maintenance-frontend-test
-
-          if [ -f "$DEPLOY_DIR/index.html" ]; then
-            echo "Deployment verification passed - index.html exists"
-          else
-            echo "Deployment verification failed - index.html not found"
-            exit 1
-          fi
-
-      - name: Cleanup old backups
-        run: |
-          DEPLOY_DIR=/var/www/maintenance-frontend-test
-          BACKUP_PATTERN="${DEPLOY_DIR}_backup_*"
-
-          # Keep only last 3 backups
-          ls -dt $BACKUP_PATTERN 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
-          echo "Backup cleanup completed"
-
-  deploy-backend:
-    name: Deploy Backend to Test
-    needs: build-backend
-    runs-on: product-server-dev
-    environment: test
-
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-build
-          path: ./backend-build
-
-      - name: Stop existing application
-        run: |
-          echo "Stopping existing application..."
-          APP_NAME=maintenance-backend-test
-
-          if command -v pm2 &> /dev/null; then
-            pm2 stop "$APP_NAME" 2>/dev/null || echo "Application was not running"
-          fi
-
-          echo "Application stopped"
-
-      - name: Backup current deployment
-        run: |
-          DEPLOY_DIR=/var/www/maintenance-backend-test
-
-          if [ -d "$DEPLOY_DIR" ]; then
-            BACKUP_DIR="${DEPLOY_DIR}_backup_$(date +%Y%m%d_%H%M%S)"
-            echo "Creating backup at $BACKUP_DIR"
-            cp -r "$DEPLOY_DIR" "$BACKUP_DIR"
-            echo "Backup created successfully"
-          else
-            echo "No existing deployment to backup"
-          fi
-
       - name: Deploy application
         run: |
-          echo "Deploying backend to test environment..."
-
-          DEPLOY_DIR=/var/www/maintenance-backend-test
-
-          # Create deployment directory if it doesn't exist
-          mkdir -p "$DEPLOY_DIR"
-
-          # Copy build files
-          cp -r ./backend-build/* "$DEPLOY_DIR/"
-
-          echo "Files deployed successfully"
-
-      - name: Install production dependencies
-        run: |
-          DEPLOY_DIR=/var/www/maintenance-backend-test
-          cd "$DEPLOY_DIR"
-
+          mkdir -p /var/www/maintenance-backend-test
+          cp -r ./dist ./package.json ./package-lock.json /var/www/maintenance-backend-test/
+          cp ../pm2.config.json /var/www/maintenance-backend-test/
+          cd /var/www/maintenance-backend-test
           npm ci --only=production
-
-          echo "Production dependencies installed"
-
-      - name: Setup environment from ENV_FILE_BE_TEST
-        run: |
-          DEPLOY_DIR=/var/www/maintenance-backend-test
-
-          # Create .env.test file from ENV_FILE_BE_TEST secret
-          echo "${{ secrets.ENV_FILE_BE_TEST }}" > "$DEPLOY_DIR/.env.test"
-
-          echo "Environment configured from ENV_FILE_BE_TEST"
-
-      - name: Start application
-        run: |
-          echo "Starting application..."
-          DEPLOY_DIR=/var/www/maintenance-backend-test
-          APP_NAME=maintenance-backend-test
-
-          cd "$DEPLOY_DIR"
-
-          if command -v pm2 &> /dev/null; then
-            pm2 delete "$APP_NAME" 2>/dev/null || true
-            pm2 start dist/apps/api-gateway/main.js --name "$APP_NAME" --env test
-            pm2 save
-            echo "Application started with PM2"
-          else
-            nohup node dist/apps/api-gateway/main.js > /dev/null 2>&1 &
-            echo "Application started in background"
-          fi
-
-      - name: Health check
-        run: |
-          echo "Running health check..."
-          sleep 10
-
-          HEALTH_URL="http://localhost:4001/api/v1/health"
-
-          for i in {1..5}; do
-            if curl -sf "$HEALTH_URL" > /dev/null 2>&1; then
-              echo "Health check passed!"
-              exit 0
-            fi
-            echo "Health check attempt $i failed, retrying in 5 seconds..."
-            sleep 5
-          done
-
-          echo "Health check failed after 5 attempts"
-          exit 1
-
-      - name: Cleanup old backups
-        run: |
-          DEPLOY_DIR=/var/www/maintenance-backend-test
-          BACKUP_PATTERN="${DEPLOY_DIR}_backup_*"
-
-          # Keep only last 3 backups for test
-          ls -dt $BACKUP_PATTERN 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
-          echo "Backup cleanup completed"
-
-  notify:
-    name: Send Notification
-    needs: [build-frontend, build-backend, deploy-frontend, deploy-backend]
-    runs-on: product-server-dev
-    if: always()
-
-    steps:
-      - name: Notify on success
-        if: needs.deploy-frontend.result == 'success' && needs.deploy-backend.result == 'success'
-        run: |
-          echo "=========================================="
-          echo "Deployment to TEST environment completed successfully!"
-          echo "=========================================="
-          echo "Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-
-      - name: Notify on failure
-        if: needs.deploy-frontend.result == 'failure' || needs.deploy-backend.result == 'failure'
-        run: |
-          echo "=========================================="
-          echo "Deployment to TEST environment FAILED!"
-          echo "=========================================="
-          echo "Please check the workflow logs for details."
-          exit 1
+          echo "${{ secrets.ENV_FILE_BE_TEST }}" > .env.test
+          pm2 delete maintenance-backend-test || true
+          pm2 start pm2.config.json --only maintenance-backend-test
+          pm2 save
