@@ -1,0 +1,55 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build output
+dist
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Environment files (injected by Coolify)
+.env
+.env.*
+!.env.production.example
+
+# Tests
+coverage
+*.spec.ts
+test
+**/*.test.ts
+
+# Documentation
+*.md
+!README.md
+docs
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log
+tmp
+temp
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.circleci
+
+# Lock files (use package-lock.json only)
+bun.lock
+yarn.lock
+pnpm-lock.yaml

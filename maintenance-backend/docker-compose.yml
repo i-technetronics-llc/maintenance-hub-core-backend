@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: maintenance-api
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - APP_PORT=3000
+      - APP_NAME=${APP_NAME:-Maintenance Automation Platform}
+      - API_PREFIX=${API_PREFIX:-/api/v1}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-maintenance_db}
+      - DB_USER=${DB_USER:-maintenance_user}
+      - DB_PASSWORD=${DB_PASSWORD:-maintenance_pass}
+      - DB_SYNCHRONIZE=${DB_SYNCHRONIZE:-false}
+      - DB_LOGGING=${DB_LOGGING:-false}
+      - DB_SSL_ENABLED=${DB_SSL_ENABLED:-false}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-1h}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION:-7d}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_ENABLED=${REDIS_ENABLED:-true}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_PRETTY_PRINT=${LOG_PRETTY_PRINT:-false}
+      - RATE_LIMIT_TTL=${RATE_LIMIT_TTL:-60}
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
+      - BCRYPT_ROUNDS=${BCRYPT_ROUNDS:-10}
+      - MAX_LOGIN_ATTEMPTS=${MAX_LOGIN_ATTEMPTS:-5}
+      - LOCKOUT_DURATION_MINUTES=${LOCKOUT_DURATION_MINUTES:-30}
+      - ENABLE_SWAGGER=${ENABLE_SWAGGER:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - maintenance-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: maintenance-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${DB_NAME:-maintenance_db}
+      - POSTGRES_USER=${DB_USER:-maintenance_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-maintenance_pass}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-maintenance_user} -d ${DB_NAME:-maintenance_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - maintenance-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: maintenance-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - maintenance-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  maintenance-network:
+    driver: bridge

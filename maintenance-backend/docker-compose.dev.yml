@@ -1,0 +1,99 @@
+version: '3.8'
+
+# Development compose - mounts source code for hot reload
+# Usage: docker-compose -f docker-compose.dev.yml up
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: maintenance-api-dev
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+      - "9229:9229"  # Debug port
+    environment:
+      - NODE_ENV=development
+      - APP_PORT=3000
+      - APP_NAME=Maintenance Automation Platform (Dev)
+      - API_PREFIX=/api/v1
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=maintenance_db
+      - DB_USER=maintenance_user
+      - DB_PASSWORD=maintenance_pass
+      - DB_SYNCHRONIZE=true
+      - DB_LOGGING=true
+      - DB_SSL_ENABLED=false
+      - JWT_SECRET=dev-jwt-secret-minimum-32-characters-long
+      - JWT_EXPIRATION=1d
+      - JWT_REFRESH_SECRET=dev-refresh-secret-minimum-32-chars
+      - JWT_REFRESH_EXPIRATION=7d
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_ENABLED=true
+      - CORS_ORIGIN=*
+      - LOG_LEVEL=debug
+      - LOG_PRETTY_PRINT=true
+      - RATE_LIMIT_TTL=60
+      - RATE_LIMIT_MAX=1000
+      - BCRYPT_ROUNDS=4
+      - MAX_LOGIN_ATTEMPTS=10
+      - LOCKOUT_DURATION_MINUTES=5
+      - ENABLE_SWAGGER=true
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - maintenance-network-dev
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: maintenance-postgres-dev
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=maintenance_db
+      - POSTGRES_USER=maintenance_user
+      - POSTGRES_PASSWORD=maintenance_pass
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U maintenance_user -d maintenance_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - maintenance-network-dev
+
+  redis:
+    image: redis:7-alpine
+    container_name: maintenance-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data_dev:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - maintenance-network-dev
+
+volumes:
+  postgres_data_dev:
+  redis_data_dev:
+
+networks:
+  maintenance-network-dev:
+    driver: bridge
