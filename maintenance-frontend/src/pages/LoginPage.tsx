@@ -91,7 +91,7 @@ export default function LoginPage() {
 
           <h1 className="text-5xl font-extrabold mb-6 text-center leading-tight tracking-tight">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-indigo-200">
-              Servicare
+              ServiCare
             </span>
             <br />
             <span className="text-indigo-400">Automation Platform</span>
