@@ -1,7 +1,22 @@
 {
   "permissions": {
     "allow": [
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(ssh root@208.84.101.90 \"cat /opt/maintenance-backend/.env 2>/dev/null || echo ''NO_ENV_FILE''\")",
+      "Bash(ssh root@208.84.101.90 \"cd /opt/maintenance-backend && sed -i ''s|^CORS_ORIGIN=.*|CORS_ORIGIN=https://maintenance-core.netlify.app,http://localhost:3001,http://localhost:5173|'' .env && grep CORS_ORIGIN .env\")",
+      "Bash(ssh root@208.84.101.90 \"cd /opt/maintenance-backend && docker-compose restart api && docker-compose ps\")",
+      "Bash(ssh root@208.84.101.90 \"cd /opt/maintenance-backend && docker compose restart api && docker compose ps\")",
+      "Bash(ssh root@208.84.101.90 \"cd /opt/maintenance-backend && sed -i ''s|^CORS_ORIGIN=.*|CORS_ORIGIN=https://maintenance-core.netlify.app,https://servicare.itechnetronics.com,http://localhost:3001,http://localhost:5173|'' .env && grep CORS_ORIGIN .env\")",
+      "Bash(ssh root@208.84.101.90 \"cd /opt/maintenance-backend && docker compose restart api\")",
+      "Bash(ssh root@208.84.101.90 \"curl -s http://localhost:3000/health\")",
+      "Bash(ssh root@208.84.101.90 \"curl -s http://localhost:3000/api/v1/health\")",
+      "Bash(ssh root@208.84.101.90 \"cd /opt/maintenance-backend && docker compose ps\")",
+      "Bash(rsync:*)",
+      "Bash(ssh root@208.84.101.90 \"cd /opt/maintenance-backend && docker compose up -d --build\")",
+      "Bash(ssh root@208.84.101.90 \"cd /opt/maintenance-backend && docker compose ps && sleep 45 && docker compose ps\")",
+      "Bash(ssh root@208.84.101.90 \"cat > /opt/maintenance-backend/.env << ''EOF''\n# Application\nNODE_ENV=production\nAPP_PORT=3000\nAPP_NAME=MaintenanceAutomationPlatform\nAPI_PREFIX=/api/v1\n\n# Database \\(Supabase Pooler\\)\nDB_HOST=aws-1-eu-central-1.pooler.supabase.com\nDB_PORT=5432\nDB_NAME=postgres\nDB_USER=postgres.giscihccyvspholprfrj\nDB_PASSWORD=Z6RMxRop60H846iS\nDB_SYNCHRONIZE=true\nDB_LOGGING=false\nDB_SSL_ENABLED=true\n\n# JWT\nJWT_SECRET=kJ9mN2pL4qR7sT0vW3xY6zA8bC1dE5fG7hI9jK2lM4nO6pQ8rS0tU3vW5xY7zA\nJWT_EXPIRATION=1h\nJWT_REFRESH_SECRET=aB3cD5eF7gH9iJ1kL3mN5oP7qR9sT1uV3wX5yZ7aB9cD1eF3gH5iJ7kL9mN1oP3q\nJWT_REFRESH_EXPIRATION=7d\n\n# Redis \\(Docker internal network\\)\nREDIS_HOST=redis\nREDIS_PORT=6379\nREDIS_PASSWORD=\nREDIS_TTL=3600\nREDIS_ENABLED=true\n\n# CORS\nCORS_ORIGIN=https://maintenance-core.netlify.app,https://servicare.itechnetronics.com,http://localhost:3001,http://localhost:5173\n\n# Logging\nLOG_LEVEL=info\nLOG_PRETTY_PRINT=false\n\n# Rate Limiting\nRATE_LIMIT_TTL=60\nRATE_LIMIT_MAX=100\n\n# Security\nBCRYPT_ROUNDS=12\nMAX_LOGIN_ATTEMPTS=5\nLOCKOUT_DURATION_MINUTES=30\n\n# Feature Flags\nENABLE_SWAGGER=true\nEOF\")",
+      "Bash(ssh root@208.84.101.90 \"cd /opt/maintenance-backend && docker compose restart api && sleep 5 && docker logs maintenance-api --tail 30\")",
+      "Bash(ssh:*)"
     ]
   }
 }
