@@ -96,7 +96,7 @@ export default function LoginPage() {
           </h1>
           
           <p className="text-lg text-slate-300 mb-14 text-center max-w-lg font-light leading-relaxed">
-            The complete solution for intelligent asset management, work order automation, and predictive maintenance analytics.
+            The complete solution for intelligent business management, work order automation, and predictive maintenance analytics.
           </p>
 
           {/* Feature Pills */}
