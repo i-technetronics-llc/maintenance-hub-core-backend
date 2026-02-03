@@ -91,14 +91,12 @@ export default function LoginPage() {
 
           <h1 className="text-5xl font-extrabold mb-6 text-center leading-tight tracking-tight">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-indigo-200">
-              ServiCare
+              ServiCare Automation
             </span>
-            <br />
-            <span className="text-indigo-400">Automation Platform</span>
           </h1>
           
           <p className="text-lg text-slate-300 mb-14 text-center max-w-lg font-light leading-relaxed">
-            The complete solution for intelligent asset management, work order automation, and predictive maintenance analytics.
+            The complete solution for intelligent business management, work order automation, and predictive maintenance analytics.
           </p>
 
           {/* Feature Pills */}
