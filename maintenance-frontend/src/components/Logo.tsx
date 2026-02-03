@@ -54,10 +54,7 @@ export const Logo = ({ collapsed = false, className = '' }: LogoProps) => {
         <div className="ml-3 transition-all duration-300">
           <div className="flex flex-col">
             <span className="text-xl font-bold text-gray-900 leading-tight">
-              MaintenanceHub
-            </span>
-            <span className="text-xs text-gray-500 font-medium">
-              Automation Platform
+              ServiCare Automation
             </span>
           </div>
         </div>
