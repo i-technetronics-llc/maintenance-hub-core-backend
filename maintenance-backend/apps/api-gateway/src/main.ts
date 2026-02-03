@@ -14,9 +14,12 @@ async function bootstrap() {
   // Replace default logger with Pino
   app.useLogger(app.get(Logger));
 
-  // Enable CORS - allow all origins
+  // Enable CORS with allowed origins from environment
+  const corsOrigin = configService.get<string>('CORS_ORIGIN', '*');
+  const allowedOrigins = corsOrigin === '*' ? '*' : corsOrigin.split(',').map(o => o.trim());
+
   app.enableCors({
-    origin: '*',
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
     allowedHeaders: [
       'Content-Type',
@@ -30,6 +33,7 @@ async function bootstrap() {
       'X-Company-Id',
     ],
     exposedHeaders: ['Authorization', 'X-Total-Count'],
+    credentials: true,
     preflightContinue: false,
     optionsSuccessStatus: 204,
   });

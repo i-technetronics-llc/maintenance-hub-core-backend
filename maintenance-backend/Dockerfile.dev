@@ -1,0 +1,22 @@
+# Development Dockerfile with hot reload
+FROM node:20-alpine
+
+# Install build dependencies for native modules (bcrypt)
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Expose ports (app + debug)
+EXPOSE 3000 9229
+
+# Start in development mode with hot reload
+CMD ["npm", "run", "start:dev"]

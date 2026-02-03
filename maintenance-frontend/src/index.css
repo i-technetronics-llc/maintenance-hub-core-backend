@@ -13,9 +13,12 @@
   font-display: swap;
 }
 
+html, body {
+  height: 100%;
+}
+
 html {
   font-size: 14px;
-  zoom: 0.9;
 }
 
 body {

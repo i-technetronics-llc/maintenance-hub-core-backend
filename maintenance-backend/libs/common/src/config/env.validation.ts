@@ -22,7 +22,7 @@ export const envValidationSchema = Joi.object({
   DB_PORT: Joi.number().port().default(5432),
   DB_NAME: Joi.string().required(),
   DB_USER: Joi.string().required(),
-  DB_PASSWORD: Joi.string().required(),
+  DB_PASSWORD: Joi.string().optional(),
   DB_SYNCHRONIZE: Joi.boolean().default(false),
   DB_LOGGING: Joi.boolean().default(false),
   DB_SSL_ENABLED: Joi.boolean().default(true),

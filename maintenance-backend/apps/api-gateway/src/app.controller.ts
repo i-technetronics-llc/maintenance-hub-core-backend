@@ -1,12 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { Public } from '@app/common';
 
 @ApiTags('health')
 @Controller()
 export class AppController {
   constructor(private configService: ConfigService) {}
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Root endpoint' })
   getRoot() {
@@ -17,6 +19,7 @@ export class AppController {
     };
   }
 
+  @Public()
   @Get('health')
   @ApiOperation({ summary: 'Health check endpoint' })
   getHealth() {
