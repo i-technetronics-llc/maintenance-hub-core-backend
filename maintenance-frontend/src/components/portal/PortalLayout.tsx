@@ -224,7 +224,7 @@ export function PortalLayout() {
               </a>
             </p>
             <p className="text-sm text-gray-400 mt-2 md:mt-0">
-              Powered by Maintenance Management System
+              Powered by ServiCare Management System
             </p>
           </div>
         </div>
