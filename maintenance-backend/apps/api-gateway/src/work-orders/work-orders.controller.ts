@@ -5,6 +5,7 @@ import { CreateWorkOrderDto } from './dto/create-work-order.dto';
 import { UpdateWorkOrderDto } from './dto/update-work-order.dto';
 import { RescheduleWorkOrderDto } from './dto/reschedule-work-order.dto';
 import { JwtAuthGuard } from '@app/common/guards';
+import { Permissions } from '@app/common/decorators';
 
 @ApiTags('work-orders')
 @Controller('work-orders')
@@ -14,12 +15,14 @@ export class WorkOrdersController {
   constructor(private readonly workOrdersService: WorkOrdersService) {}
 
   @Post()
+  @Permissions('work_order_management:create')
   @ApiOperation({ summary: 'Create a new work order' })
   create(@Body() createWorkOrderDto: CreateWorkOrderDto) {
     return this.workOrdersService.create(createWorkOrderDto);
   }
 
   @Get()
+  @Permissions('work_order_management:view')
   @ApiOperation({ summary: 'Get all work orders with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
@@ -46,24 +49,28 @@ export class WorkOrdersController {
   }
 
   @Get(':id')
+  @Permissions('work_order_management:view')
   @ApiOperation({ summary: 'Get a work order by ID' })
   findOne(@Param('id') id: string) {
     return this.workOrdersService.findOne(id);
   }
 
   @Patch(':id')
+  @Permissions('work_order_management:edit')
   @ApiOperation({ summary: 'Update a work order' })
   update(@Param('id') id: string, @Body() updateWorkOrderDto: UpdateWorkOrderDto) {
     return this.workOrdersService.update(id, updateWorkOrderDto);
   }
 
   @Delete(':id')
+  @Permissions('work_order_management:delete')
   @ApiOperation({ summary: 'Delete a work order' })
   remove(@Param('id') id: string) {
     return this.workOrdersService.remove(id);
   }
 
   @Patch(':id/reschedule')
+  @Permissions('work_order_management:schedule')
   @ApiOperation({ summary: 'Reschedule a work order to a new date' })
   @ApiResponse({ status: 200, description: 'Work order rescheduled successfully' })
   @ApiResponse({ status: 404, description: 'Work order not found' })
@@ -76,6 +83,7 @@ export class WorkOrdersController {
   }
 
   @Get('scheduling/conflicts')
+  @Permissions('scheduling:view')
   @ApiOperation({ summary: 'Check for scheduling conflicts' })
   @ApiQuery({ name: 'date', required: true, type: String })
   @ApiQuery({ name: 'technicianId', required: false, type: String })
@@ -87,6 +95,7 @@ export class WorkOrdersController {
   }
 
   @Get('scheduling/calendar')
+  @Permissions('scheduling:view')
   @ApiOperation({ summary: 'Get work orders for calendar view' })
   @ApiQuery({ name: 'startDate', required: true, type: String })
   @ApiQuery({ name: 'endDate', required: true, type: String })

@@ -11,14 +11,24 @@ export enum UserRole {
   PLANNER_SCHEDULER = 'planner_scheduler',
   TECHNICIAN = 'technician',
 
+  // Operations
+  OPERATIONS_MANAGER = 'operations_manager',
+
   // Inventory/Store Roles
   STOREKEEPER = 'storekeeper',
+  INVENTORY_MANAGER = 'inventory_manager',
 
   // Engineering Roles
   RELIABILITY_ENGINEER = 'reliability_engineer',
 
   // Finance Roles
   FINANCE_CONTROLLER = 'finance_controller',
+
+  // Procurement
+  PROCUREMENT_OFFICER = 'procurement_officer',
+
+  // Support
+  SUPPORT_MANAGER = 'support_manager',
 
   // Basic Roles
   REQUESTER = 'requester',
@@ -119,6 +129,18 @@ export enum PermissionModule {
   USER_MANAGEMENT = 'user_management',
   BILLING = 'billing',
 
+  // Modules from CSV Permission Matrix
+  DASHBOARD = 'dashboard',
+  SCHEDULING = 'scheduling',
+  CLIENT_MANAGEMENT = 'client_management',
+  SLA = 'sla',
+  VENDOR_MANAGEMENT = 'vendor_management',
+  PROCUREMENT = 'procurement',
+  ESCALATION = 'escalation',
+  INCIDENT_MANAGEMENT = 'incident_management',
+  PERFORMANCE = 'performance',
+  TOOLS = 'tools',
+
   // Additional System Modules
   ROLES = 'roles',
   PERMISSIONS = 'permissions',
@@ -147,6 +169,7 @@ export enum PermissionAction {
   EXPORT = 'export',
   MANAGE = 'manage',
   FULL_ACCESS = 'full_access',
+  REVIEW = 'review',
 }
 
 export enum CompanyStatus {

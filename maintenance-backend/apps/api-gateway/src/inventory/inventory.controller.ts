@@ -22,6 +22,7 @@ import {
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto, UpdateInventoryDto } from './dto';
 import { JwtAuthGuard } from '@app/common/guards';
+import { Permissions } from '@app/common/decorators';
 
 @ApiTags('Inventory')
 @Controller('inventory')
@@ -31,6 +32,7 @@ export class InventoryController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @Permissions('inventory:create')
   @ApiOperation({ summary: 'Create a new inventory item' })
   @ApiResponse({ status: 201, description: 'Inventory item created successfully' })
   @ApiResponse({ status: 409, description: 'Inventory with this SKU already exists' })
@@ -47,6 +49,7 @@ export class InventoryController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @Permissions('inventory:view')
   @ApiOperation({ summary: 'Get all inventory items' })
   @ApiResponse({ status: 200, description: 'Inventory items retrieved successfully' })
   @ApiQuery({ name: 'search', required: false })
@@ -89,6 +92,7 @@ export class InventoryController {
   @Get('low-stock')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @Permissions('inventory:view')
   @ApiOperation({ summary: 'Get inventory items with low stock' })
   @ApiResponse({ status: 200, description: 'Low stock items retrieved successfully' })
   async getLowStockItems() {
@@ -102,6 +106,7 @@ export class InventoryController {
   @Post('check-availability')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @Permissions('inventory:view')
   @ApiOperation({ summary: 'Check availability of inventory items' })
   @ApiResponse({ status: 200, description: 'Availability checked successfully' })
   async checkAvailability(@Body() body: { itemIds: string[] }) {
@@ -115,6 +120,7 @@ export class InventoryController {
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @Permissions('inventory:view')
   @ApiOperation({ summary: 'Get an inventory item by ID' })
   @ApiResponse({ status: 200, description: 'Inventory item retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Inventory item not found' })
@@ -129,6 +135,7 @@ export class InventoryController {
   @Get('sku/:sku')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @Permissions('inventory:view')
   @ApiOperation({ summary: 'Get an inventory item by SKU' })
   @ApiResponse({ status: 200, description: 'Inventory item retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Inventory item not found' })
@@ -143,6 +150,7 @@ export class InventoryController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @Permissions('inventory:edit')
   @ApiOperation({ summary: 'Update an inventory item' })
   @ApiResponse({ status: 200, description: 'Inventory item updated successfully' })
   @ApiResponse({ status: 404, description: 'Inventory item not found' })
@@ -159,6 +167,7 @@ export class InventoryController {
   @Patch(':id/adjust')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @Permissions('inventory:adjust')
   @ApiOperation({ summary: 'Adjust inventory quantity' })
   @ApiResponse({ status: 200, description: 'Inventory quantity adjusted successfully' })
   @ApiResponse({ status: 404, description: 'Inventory item not found' })
@@ -177,6 +186,7 @@ export class InventoryController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @Permissions('inventory:delete')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete an inventory item' })
   @ApiResponse({ status: 204, description: 'Inventory item deleted successfully' })

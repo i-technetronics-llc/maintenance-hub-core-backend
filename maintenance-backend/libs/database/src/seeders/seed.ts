@@ -130,6 +130,62 @@ const ALL_PERMISSIONS = [
 
   // Audit module
   { code: 'audit:view', module: PermissionModule.AUDIT, action: PermissionAction.VIEW, description: 'View audit logs' },
+
+  // Dashboard module
+  { code: 'dashboard:view', module: PermissionModule.DASHBOARD, action: PermissionAction.VIEW, description: 'View dashboard and overview' },
+
+  // Scheduling module
+  { code: 'scheduling:view', module: PermissionModule.SCHEDULING, action: PermissionAction.VIEW, description: 'View schedules and calendar' },
+  { code: 'scheduling:create', module: PermissionModule.SCHEDULING, action: PermissionAction.CREATE, description: 'Create schedules' },
+  { code: 'scheduling:edit', module: PermissionModule.SCHEDULING, action: PermissionAction.EDIT, description: 'Edit schedules' },
+  { code: 'scheduling:assign', module: PermissionModule.SCHEDULING, action: PermissionAction.ASSIGN, description: 'Assign tasks to technicians' },
+  { code: 'scheduling:dispatch', module: PermissionModule.SCHEDULING, action: PermissionAction.DISPATCH, description: 'Dispatch work orders' },
+
+  // Client Management module
+  { code: 'client_management:view', module: PermissionModule.CLIENT_MANAGEMENT, action: PermissionAction.VIEW, description: 'View clients' },
+  { code: 'client_management:create', module: PermissionModule.CLIENT_MANAGEMENT, action: PermissionAction.CREATE, description: 'Create and onboard clients' },
+  { code: 'client_management:edit', module: PermissionModule.CLIENT_MANAGEMENT, action: PermissionAction.EDIT, description: 'Edit client information' },
+  { code: 'client_management:delete', module: PermissionModule.CLIENT_MANAGEMENT, action: PermissionAction.DELETE, description: 'Delete clients' },
+
+  // SLA module
+  { code: 'sla:view', module: PermissionModule.SLA, action: PermissionAction.VIEW, description: 'View SLAs' },
+  { code: 'sla:create', module: PermissionModule.SLA, action: PermissionAction.CREATE, description: 'Create SLAs' },
+  { code: 'sla:edit', module: PermissionModule.SLA, action: PermissionAction.EDIT, description: 'Edit SLAs' },
+  { code: 'sla:delete', module: PermissionModule.SLA, action: PermissionAction.DELETE, description: 'Delete SLAs' },
+
+  // Vendor Management module
+  { code: 'vendor_management:view', module: PermissionModule.VENDOR_MANAGEMENT, action: PermissionAction.VIEW, description: 'View vendors' },
+  { code: 'vendor_management:create', module: PermissionModule.VENDOR_MANAGEMENT, action: PermissionAction.CREATE, description: 'Onboard vendors' },
+  { code: 'vendor_management:edit', module: PermissionModule.VENDOR_MANAGEMENT, action: PermissionAction.EDIT, description: 'Edit vendor information' },
+
+  // Procurement module
+  { code: 'procurement:view', module: PermissionModule.PROCUREMENT, action: PermissionAction.VIEW, description: 'View procurement requests' },
+  { code: 'procurement:create', module: PermissionModule.PROCUREMENT, action: PermissionAction.CREATE, description: 'Create procurement requests' },
+  { code: 'procurement:approve', module: PermissionModule.PROCUREMENT, action: PermissionAction.APPROVE, description: 'Approve procurement requests' },
+
+  // Escalation module
+  { code: 'escalation:view', module: PermissionModule.ESCALATION, action: PermissionAction.VIEW, description: 'View escalations' },
+  { code: 'escalation:create', module: PermissionModule.ESCALATION, action: PermissionAction.CREATE, description: 'Create escalation requests' },
+  { code: 'escalation:approve', module: PermissionModule.ESCALATION, action: PermissionAction.APPROVE, description: 'Approve escalation actions' },
+
+  // Incident Management module
+  { code: 'incident_management:view', module: PermissionModule.INCIDENT_MANAGEMENT, action: PermissionAction.VIEW, description: 'View incidents' },
+  { code: 'incident_management:create', module: PermissionModule.INCIDENT_MANAGEMENT, action: PermissionAction.CREATE, description: 'Create incident reports' },
+  { code: 'incident_management:edit', module: PermissionModule.INCIDENT_MANAGEMENT, action: PermissionAction.EDIT, description: 'Edit incident reports' },
+
+  // Performance module
+  { code: 'performance:view', module: PermissionModule.PERFORMANCE, action: PermissionAction.VIEW, description: 'View team performance' },
+  { code: 'performance:edit', module: PermissionModule.PERFORMANCE, action: PermissionAction.EDIT, description: 'Edit performance reviews' },
+
+  // Tools module
+  { code: 'tools:view', module: PermissionModule.TOOLS, action: PermissionAction.VIEW, description: 'View tools and utilities' },
+  { code: 'tools:execute', module: PermissionModule.TOOLS, action: PermissionAction.EXECUTE, description: 'Execute tools (scanner, etc.)' },
+
+  // Additional actions for existing modules
+  { code: 'asset_management:assign', module: PermissionModule.ASSET_MANAGEMENT, action: PermissionAction.ASSIGN, description: 'Reassign assets' },
+  { code: 'pm_schedules:approve', module: PermissionModule.PM_SCHEDULES, action: PermissionAction.APPROVE, description: 'Approve maintenance requests' },
+  { code: 'work_order_management:review', module: PermissionModule.WORK_ORDER_MANAGEMENT, action: PermissionAction.REVIEW, description: 'Review completed work orders' },
+  { code: 'billing:approve', module: PermissionModule.BILLING, action: PermissionAction.APPROVE, description: 'Approve purchase requests and payments' },
 ];
 
 async function seed() {
@@ -254,9 +310,9 @@ async function seed() {
       companyId: null,
     });
 
-    // Assign permissions to COMPANY_ADMIN (all except company_management full access)
+    // Assign permissions to COMPANY_ADMIN (all except company_management create/delete/approve)
     const companyAdminPermissions = permissions.filter(
-      (p) => !p.code.startsWith('company_management:') || p.code === 'company_management:view'
+      (p) => !['company_management:create', 'company_management:delete', 'company_management:approve'].includes(p.code)
     );
     await Promise.all(
       companyAdminPermissions.map((perm) =>
@@ -293,68 +349,184 @@ async function seed() {
     return role;
   };
 
-  // Create all roles based on README permission matrix
-  const maintenanceManagerRole = await findOrCreateRole(
-    UserRole.MAINTENANCE_MANAGER,
-    'Full maintenance operations control',
-    [
-      'asset_management:view', 'asset_management:create', 'asset_management:edit', 'asset_management:delete',
-      'work_order_management:view', 'work_order_management:create', 'work_order_management:edit', 'work_order_management:delete', 'work_order_management:approve', 'work_order_management:assign',
-      'pm_schedules:view', 'pm_schedules:create', 'pm_schedules:edit', 'pm_schedules:delete',
-      'inventory:view', 'inventory:edit', 'inventory:adjust',
-      'mobile:full_access',
-      'reporting:view', 'reporting:export',
-    ]
-  );
+  // Create all roles based on CSV permission matrix
 
-  const maintenanceSupervisorRole = await findOrCreateRole(
-    UserRole.MAINTENANCE_SUPERVISOR,
-    'Team supervision and approval',
-    [
-      'asset_management:view', 'asset_management:edit',
-      'work_order_management:view', 'work_order_management:create', 'work_order_management:edit', 'work_order_management:approve', 'work_order_management:assign',
-      'pm_schedules:view', 'pm_schedules:edit',
-      'inventory:view',
-      'mobile:full_access',
-      'reporting:view',
-    ]
-  );
-
-  const plannerSchedulerRole = await findOrCreateRole(
-    UserRole.PLANNER_SCHEDULER,
-    'Work planning and scheduling',
-    [
-      'asset_management:view',
-      'work_order_management:view', 'work_order_management:edit', 'work_order_management:schedule', 'work_order_management:dispatch',
-      'pm_schedules:view', 'pm_schedules:create', 'pm_schedules:edit',
-      'inventory:view', 'inventory:reserve',
-      'mobile:view',
-      'reporting:view',
-    ]
-  );
+  // --- Roles from CSV ---
 
   const technicianRole = await findOrCreateRole(
     UserRole.TECHNICIAN,
     'Field execution and updates',
     [
+      'dashboard:view',
+      'work_order_management:view', 'work_order_management:execute',
+      'inventory:view', 'inventory:request', 'inventory:reserve',
       'asset_management:view',
-      'work_order_management:view', 'work_order_management:edit', 'work_order_management:execute',
-      'pm_schedules:view',
-      'inventory:view', 'inventory:request',
-      'mobile:full_access',
+      'scheduling:view',
+      'escalation:view', 'escalation:create',
       'reporting:view',
+      'performance:view',
+      'tools:view', 'tools:execute',
+      'settings:view',
+      'mobile:full_access',
     ]
   );
 
   const storekeeperRole = await findOrCreateRole(
     UserRole.STOREKEEPER,
-    'Inventory management',
+    'Inventory and stock management',
     [
-      'asset_management:view',
+      'dashboard:view',
       'work_order_management:view',
-      'inventory:view', 'inventory:create', 'inventory:edit', 'inventory:delete', 'inventory:adjust',
-      'mobile:view', 'mobile:create', 'mobile:edit',
+      'inventory:view', 'inventory:create', 'inventory:edit', 'inventory:adjust', 'inventory:reserve', 'inventory:request',
+      'asset_management:view', 'asset_management:assign',
+      'scheduling:view',
+      'client_management:view',
+      'escalation:view', 'escalation:create',
       'reporting:view',
+      'performance:view',
+      'tools:view', 'tools:execute',
+      'settings:view',
+      'mobile:view', 'mobile:create', 'mobile:edit',
+    ]
+  );
+
+  const financeControllerRole = await findOrCreateRole(
+    UserRole.FINANCE_CONTROLLER,
+    'Financial oversight and cost management',
+    [
+      'dashboard:view',
+      'work_order_management:view', 'work_order_management:approve',
+      'inventory:view',
+      'procurement:view', 'procurement:create',
+      'client_management:view',
+      'vendor_management:view',
+      'billing:view', 'billing:create', 'billing:edit', 'billing:full_access',
+      'reporting:view', 'reporting:create', 'reporting:export',
+      'settings:view',
+    ]
+  );
+
+  const operationsManagerRole = await findOrCreateRole(
+    UserRole.OPERATIONS_MANAGER,
+    'Full operational control across all modules',
+    [
+      'dashboard:view',
+      'work_order_management:view', 'work_order_management:create', 'work_order_management:edit', 'work_order_management:delete',
+      'work_order_management:approve', 'work_order_management:assign', 'work_order_management:review',
+      'inventory:view', 'inventory:create', 'inventory:edit', 'inventory:adjust', 'inventory:reserve', 'inventory:request',
+      'asset_management:view', 'asset_management:create', 'asset_management:edit', 'asset_management:delete', 'asset_management:assign',
+      'scheduling:view', 'scheduling:create', 'scheduling:edit', 'scheduling:assign', 'scheduling:dispatch',
+      'client_management:view', 'client_management:create', 'client_management:edit',
+      'sla:view', 'sla:create', 'sla:edit',
+      'vendor_management:view', 'vendor_management:create', 'vendor_management:edit',
+      'pm_schedules:view', 'pm_schedules:create', 'pm_schedules:edit', 'pm_schedules:delete', 'pm_schedules:approve',
+      'escalation:view', 'escalation:create', 'escalation:approve',
+      'reporting:view', 'reporting:create', 'reporting:export',
+      'analytics:view',
+      'performance:view', 'performance:edit',
+      'user_management:view', 'user_management:create', 'user_management:edit',
+      'incident_management:view', 'incident_management:create',
+      'tools:view',
+      'settings:view', 'settings:edit',
+    ]
+  );
+
+  const plannerSchedulerRole = await findOrCreateRole(
+    UserRole.PLANNER_SCHEDULER,
+    'Work planning, scheduling and dispatch',
+    [
+      'dashboard:view',
+      'work_order_management:view', 'work_order_management:schedule', 'work_order_management:dispatch',
+      'inventory:view', 'inventory:request',
+      'asset_management:view', 'asset_management:assign',
+      'scheduling:view', 'scheduling:create', 'scheduling:edit', 'scheduling:assign', 'scheduling:dispatch',
+      'escalation:view', 'escalation:create',
+      'performance:view', 'performance:edit',
+      'settings:view',
+      'mobile:view',
+    ]
+  );
+
+  const inventoryManagerRole = await findOrCreateRole(
+    UserRole.INVENTORY_MANAGER,
+    'Inventory operations and procurement coordination',
+    [
+      'inventory:view', 'inventory:create', 'inventory:edit', 'inventory:delete', 'inventory:adjust',
+      'procurement:view', 'procurement:create',
+      'vendor_management:view',
+      'tools:view', 'tools:execute',
+      'settings:view',
+    ]
+  );
+
+  const supportManagerRole = await findOrCreateRole(
+    UserRole.SUPPORT_MANAGER,
+    'Support and incident management',
+    [
+      'dashboard:view',
+      'work_order_management:view', 'work_order_management:approve',
+      'inventory:view',
+      'scheduling:view',
+      'client_management:view',
+      'sla:view',
+      'billing:view',
+      'escalation:view', 'escalation:create',
+      'incident_management:view', 'incident_management:create', 'incident_management:edit',
+      'settings:view',
+    ]
+  );
+
+  const maintenanceSupervisorRole = await findOrCreateRole(
+    UserRole.MAINTENANCE_SUPERVISOR,
+    'Team supervision and work order approval',
+    [
+      'dashboard:view',
+      'work_order_management:view', 'work_order_management:create', 'work_order_management:edit',
+      'work_order_management:approve', 'work_order_management:assign', 'work_order_management:review',
+      'inventory:view', 'inventory:request', 'inventory:reserve',
+      'asset_management:view', 'asset_management:edit', 'asset_management:assign',
+      'scheduling:view', 'scheduling:edit', 'scheduling:assign',
+      'client_management:view',
+      'sla:view',
+      'billing:view',
+      'escalation:view', 'escalation:create',
+      'reporting:view',
+      'performance:view', 'performance:edit',
+      'incident_management:view',
+      'tools:view', 'tools:execute',
+      'settings:view',
+      'mobile:full_access',
+    ]
+  );
+
+  const procurementOfficerRole = await findOrCreateRole(
+    UserRole.PROCUREMENT_OFFICER,
+    'Procurement and vendor management',
+    [
+      'inventory:view', 'inventory:create', 'inventory:edit', 'inventory:request', 'inventory:reserve',
+      'procurement:view', 'procurement:create', 'procurement:approve',
+      'vendor_management:view', 'vendor_management:create', 'vendor_management:edit',
+      'billing:approve',
+      'settings:view',
+    ]
+  );
+
+  // --- Existing roles NOT in CSV (keep as-is) ---
+
+  const maintenanceManagerRole = await findOrCreateRole(
+    UserRole.MAINTENANCE_MANAGER,
+    'Full maintenance operations control',
+    [
+      'dashboard:view',
+      'asset_management:view', 'asset_management:create', 'asset_management:edit', 'asset_management:delete',
+      'work_order_management:view', 'work_order_management:create', 'work_order_management:edit', 'work_order_management:delete', 'work_order_management:approve', 'work_order_management:assign',
+      'pm_schedules:view', 'pm_schedules:create', 'pm_schedules:edit', 'pm_schedules:delete',
+      'inventory:view', 'inventory:edit', 'inventory:adjust',
+      'scheduling:view', 'scheduling:create', 'scheduling:edit',
+      'reporting:view', 'reporting:export',
+      'performance:view',
+      'settings:view',
+      'mobile:full_access',
     ]
   );
 
@@ -362,24 +534,14 @@ async function seed() {
     UserRole.RELIABILITY_ENGINEER,
     'Predictive maintenance and analysis',
     [
+      'dashboard:view',
       'asset_management:view', 'asset_management:create', 'asset_management:edit', 'asset_management:delete',
       'work_order_management:view',
       'pm_schedules:view', 'pm_schedules:edit', 'pm_schedules:configure',
       'inventory:view',
-      'mobile:view',
       'reporting:view', 'reporting:export', 'analytics:view',
-    ]
-  );
-
-  const financeControllerRole = await findOrCreateRole(
-    UserRole.FINANCE_CONTROLLER,
-    'Financial oversight',
-    [
-      'asset_management:view',
-      'work_order_management:view',
-      'pm_schedules:view',
-      'inventory:view',
-      'reporting:view', 'reporting:export',
+      'settings:view',
+      'mobile:view',
     ]
   );
 
@@ -387,10 +549,12 @@ async function seed() {
     UserRole.REQUESTER,
     'Submit work requests',
     [
+      'dashboard:view',
       'asset_management:view',
       'work_order_management:view', 'work_order_management:create',
-      'mobile:view', 'mobile:create',
       'reporting:view',
+      'settings:view',
+      'mobile:view', 'mobile:create',
     ]
   );
 
@@ -398,11 +562,13 @@ async function seed() {
     UserRole.VIEWER,
     'Read-only access',
     [
+      'dashboard:view',
       'asset_management:view',
       'work_order_management:view',
       'pm_schedules:view',
       'inventory:view',
       'reporting:view',
+      'settings:view',
     ]
   );
 
@@ -410,15 +576,18 @@ async function seed() {
     UserRole.MANAGER,
     'General management access',
     [
+      'dashboard:view',
       'asset_management:view', 'asset_management:create', 'asset_management:edit',
       'work_order_management:view', 'work_order_management:create', 'work_order_management:edit', 'work_order_management:delete',
       'pm_schedules:view', 'pm_schedules:create', 'pm_schedules:edit', 'pm_schedules:delete',
       'inventory:view', 'inventory:create', 'inventory:edit', 'inventory:delete',
       'reporting:view',
+      'performance:view',
+      'settings:view',
     ]
   );
 
-  console.log('✅ Ensured 10 additional system roles exist');
+  console.log('✅ Ensured 14 additional system roles exist');
 
   // Create role lookup map
   const roleMap = {
@@ -428,9 +597,13 @@ async function seed() {
     [UserRole.MAINTENANCE_SUPERVISOR]: maintenanceSupervisorRole.id,
     [UserRole.PLANNER_SCHEDULER]: plannerSchedulerRole.id,
     [UserRole.TECHNICIAN]: technicianRole.id,
+    [UserRole.OPERATIONS_MANAGER]: operationsManagerRole.id,
     [UserRole.STOREKEEPER]: storekeeperRole.id,
+    [UserRole.INVENTORY_MANAGER]: inventoryManagerRole.id,
     [UserRole.RELIABILITY_ENGINEER]: reliabilityEngineerRole.id,
     [UserRole.FINANCE_CONTROLLER]: financeControllerRole.id,
+    [UserRole.PROCUREMENT_OFFICER]: procurementOfficerRole.id,
+    [UserRole.SUPPORT_MANAGER]: supportManagerRole.id,
     [UserRole.REQUESTER]: requesterRole.id,
     [UserRole.VIEWER]: viewerRole.id,
     [UserRole.MANAGER]: managerRole.id,
@@ -591,6 +764,30 @@ async function seed() {
       firstName: 'Emma',
       lastName: 'Finance',
       role: UserRole.FINANCE_CONTROLLER,
+    },
+    {
+      email: 'operations@techservices.com',
+      firstName: 'Peter',
+      lastName: 'Operations',
+      role: UserRole.OPERATIONS_MANAGER,
+    },
+    {
+      email: 'inventory.mgr@techservices.com',
+      firstName: 'Grace',
+      lastName: 'Inventory',
+      role: UserRole.INVENTORY_MANAGER,
+    },
+    {
+      email: 'support@techservices.com',
+      firstName: 'Karen',
+      lastName: 'Support',
+      role: UserRole.SUPPORT_MANAGER,
+    },
+    {
+      email: 'procurement@techservices.com',
+      firstName: 'Daniel',
+      lastName: 'Procurement',
+      role: UserRole.PROCUREMENT_OFFICER,
     },
   ];
 
@@ -1384,7 +1581,7 @@ async function seed() {
   console.log('========================================');
   console.log(`Organization Types: 2 (Vendor Company, Client Organization)`);
   console.log(`Permissions: ${permissions.length}`);
-  console.log(`Roles: 12 (SUPER_ADMIN + COMPANY_ADMIN + 10 others from README matrix)`);
+  console.log(`Roles: 16 (SUPER_ADMIN + COMPANY_ADMIN + 14 others from CSV matrix)`);
   console.log(`Companies: 2 (1 vendor, 1 client)`);
   console.log(`Users: ${vendorUsers.length + clientUsers.length + 1 + invitedEmployees.length} (1 super-admin + ${vendorUsers.length} vendor + ${clientUsers.length} client + ${invitedEmployees.length} pending invitations)`);
   console.log(`Asset Locations: ${locations.length}`);

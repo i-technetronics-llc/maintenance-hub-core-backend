@@ -16,6 +16,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiParam, ApiResponse }
 import { ReportsService } from './reports.service';
 import { CreateReportDto, UpdateReportDto, ExecuteReportDto } from './dto';
 import { JwtAuthGuard } from '@app/common/guards';
+import { Permissions } from '@app/common/decorators';
 
 @ApiTags('reports')
 @Controller('reports')
@@ -25,6 +26,7 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Post()
+  @Permissions('reporting:create')
   @ApiOperation({ summary: 'Create a new report definition' })
   @ApiResponse({ status: 201, description: 'Report created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input' })
@@ -35,6 +37,7 @@ export class ReportsController {
   }
 
   @Get()
+  @Permissions('reporting:view')
   @ApiOperation({ summary: 'Get all saved reports for the current user/company' })
   @ApiResponse({ status: 200, description: 'Returns list of saved reports' })
   findAll(@Request() req: any) {
@@ -44,6 +47,7 @@ export class ReportsController {
   }
 
   @Get('data-sources')
+  @Permissions('reporting:view')
   @ApiOperation({ summary: 'Get available data sources for reports' })
   @ApiResponse({ status: 200, description: 'Returns list of data sources' })
   getDataSources() {
@@ -51,6 +55,7 @@ export class ReportsController {
   }
 
   @Get('columns/:dataSource')
+  @Permissions('reporting:view')
   @ApiOperation({ summary: 'Get available columns for a data source' })
   @ApiParam({ name: 'dataSource', description: 'The data source to get columns for' })
   @ApiResponse({ status: 200, description: 'Returns list of columns' })
@@ -59,6 +64,7 @@ export class ReportsController {
   }
 
   @Get(':id')
+  @Permissions('reporting:view')
   @ApiOperation({ summary: 'Get a report definition by ID' })
   @ApiParam({ name: 'id', description: 'Report ID' })
   @ApiResponse({ status: 200, description: 'Returns the report definition' })
@@ -71,6 +77,7 @@ export class ReportsController {
   }
 
   @Post(':id/execute')
+  @Permissions('reporting:view')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Execute a report and return data' })
   @ApiParam({ name: 'id', description: 'Report ID' })
@@ -88,6 +95,7 @@ export class ReportsController {
   }
 
   @Patch(':id')
+  @Permissions('reporting:edit')
   @ApiOperation({ summary: 'Update a report definition' })
   @ApiParam({ name: 'id', description: 'Report ID' })
   @ApiResponse({ status: 200, description: 'Report updated successfully' })
@@ -104,6 +112,7 @@ export class ReportsController {
   }
 
   @Delete(':id')
+  @Permissions('reporting:delete')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a report' })
   @ApiParam({ name: 'id', description: 'Report ID' })

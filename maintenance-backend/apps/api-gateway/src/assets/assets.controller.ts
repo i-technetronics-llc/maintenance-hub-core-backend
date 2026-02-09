@@ -4,6 +4,7 @@ import { AssetsService } from './assets.service';
 import { CreateAssetDto } from './dto/create-asset.dto';
 import { UpdateAssetDto } from './dto/update-asset.dto';
 import { JwtAuthGuard } from '@app/common/guards';
+import { Permissions } from '@app/common/decorators';
 
 @ApiTags('assets')
 @Controller('assets')
@@ -13,6 +14,7 @@ export class AssetsController {
   constructor(private readonly assetsService: AssetsService) {}
 
   @Post()
+  @Permissions('asset_management:create')
   @ApiOperation({ summary: 'Create a new asset' })
   create(@Body() createAssetDto: CreateAssetDto, @Request() req: any) {
     const userId = req.user?.sub || req.user?.id;
@@ -20,6 +22,7 @@ export class AssetsController {
   }
 
   @Get()
+  @Permissions('asset_management:view')
   @ApiOperation({ summary: 'Get all assets' })
   @ApiQuery({ name: 'organizationId', required: false, description: 'Filter by organization ID' })
   findAll(@Query('organizationId') organizationId?: string) {
@@ -27,12 +30,14 @@ export class AssetsController {
   }
 
   @Get(':id')
+  @Permissions('asset_management:view')
   @ApiOperation({ summary: 'Get an asset by ID' })
   findOne(@Param('id') id: string) {
     return this.assetsService.findOne(id);
   }
 
   @Patch(':id')
+  @Permissions('asset_management:edit')
   @ApiOperation({ summary: 'Update an asset' })
   update(@Param('id') id: string, @Body() updateAssetDto: UpdateAssetDto, @Request() req: any) {
     const userId = req.user?.sub || req.user?.id;
@@ -40,6 +45,7 @@ export class AssetsController {
   }
 
   @Delete(':id')
+  @Permissions('asset_management:delete')
   @ApiOperation({ summary: 'Delete an asset' })
   remove(@Param('id') id: string, @Request() req: any) {
     const userId = req.user?.sub || req.user?.id;

@@ -21,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@app/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@app/common/guards/roles.guard';
+import { Permissions } from '@app/common/decorators';
 import { PreventiveMaintenanceService } from './preventive-maintenance.service';
 import { CreatePMScheduleDto, UpdatePMScheduleDto } from './dto';
 
@@ -33,6 +34,7 @@ export class PreventiveMaintenanceController {
 
   // PM Schedule endpoints
   @Post('schedules')
+  @Permissions('pm_schedules:create')
   @ApiOperation({ summary: 'Create a new PM schedule' })
   @ApiResponse({ status: 201, description: 'PM schedule created successfully' })
   async createSchedule(@Body() createDto: CreatePMScheduleDto) {
@@ -40,6 +42,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Get('schedules')
+  @Permissions('pm_schedules:view')
   @ApiOperation({ summary: 'Get all PM schedules' })
   @ApiQuery({ name: 'organizationId', required: false })
   @ApiResponse({ status: 200, description: 'List of PM schedules' })
@@ -48,6 +51,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Get('schedules/overdue')
+  @Permissions('pm_schedules:view')
   @ApiOperation({ summary: 'Get overdue PM schedules' })
   @ApiQuery({ name: 'organizationId', required: false })
   @ApiResponse({ status: 200, description: 'List of overdue PM schedules' })
@@ -56,6 +60,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Get('schedules/upcoming')
+  @Permissions('pm_schedules:view')
   @ApiOperation({ summary: 'Get upcoming PM schedules' })
   @ApiQuery({ name: 'days', required: false, description: 'Number of days to look ahead (default 7)' })
   @ApiQuery({ name: 'organizationId', required: false })
@@ -69,6 +74,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Get('compliance')
+  @Permissions('pm_schedules:view')
   @ApiOperation({ summary: 'Get PM compliance metrics' })
   @ApiQuery({ name: 'organizationId', required: false })
   @ApiResponse({ status: 200, description: 'PM compliance metrics' })
@@ -77,6 +83,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Get('schedules/:id')
+  @Permissions('pm_schedules:view')
   @ApiOperation({ summary: 'Get a PM schedule by ID' })
   @ApiResponse({ status: 200, description: 'PM schedule details' })
   @ApiResponse({ status: 404, description: 'PM schedule not found' })
@@ -85,6 +92,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Patch('schedules/:id')
+  @Permissions('pm_schedules:edit')
   @ApiOperation({ summary: 'Update a PM schedule' })
   @ApiResponse({ status: 200, description: 'PM schedule updated successfully' })
   @ApiResponse({ status: 404, description: 'PM schedule not found' })
@@ -96,6 +104,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Delete('schedules/:id')
+  @Permissions('pm_schedules:delete')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a PM schedule' })
   @ApiResponse({ status: 204, description: 'PM schedule deleted successfully' })
@@ -105,6 +114,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Post('schedules/:id/generate-work-order')
+  @Permissions('pm_schedules:create')
   @ApiOperation({ summary: 'Manually generate a work order for a PM schedule' })
   @ApiResponse({ status: 201, description: 'Work order generated successfully' })
   @ApiResponse({ status: 400, description: 'Cannot generate work order' })
@@ -114,6 +124,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Get('schedules/:id/history')
+  @Permissions('pm_schedules:view')
   @ApiOperation({ summary: 'Get execution history for a PM schedule' })
   @ApiQuery({ name: 'limit', required: false, description: 'Limit results (default 50)' })
   @ApiResponse({ status: 200, description: 'List of execution history' })
@@ -126,6 +137,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Post('executions/:id/complete')
+  @Permissions('pm_schedules:edit')
   @ApiOperation({ summary: 'Mark a PM execution as completed' })
   @ApiResponse({ status: 200, description: 'Execution marked as completed' })
   @ApiResponse({ status: 404, description: 'Execution not found' })
@@ -139,6 +151,7 @@ export class PreventiveMaintenanceController {
 
   // PM Task Library endpoints
   @Post('tasks')
+  @Permissions('pm_schedules:create')
   @ApiOperation({ summary: 'Create a new PM task template' })
   @ApiResponse({ status: 201, description: 'PM task created successfully' })
   async createTask(@Body() taskData: any) {
@@ -146,6 +159,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Get('tasks')
+  @Permissions('pm_schedules:view')
   @ApiOperation({ summary: 'Get all PM task templates' })
   @ApiQuery({ name: 'organizationId', required: false })
   @ApiResponse({ status: 200, description: 'List of PM tasks' })
@@ -154,6 +168,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Get('tasks/:id')
+  @Permissions('pm_schedules:view')
   @ApiOperation({ summary: 'Get a PM task by ID' })
   @ApiResponse({ status: 200, description: 'PM task details' })
   @ApiResponse({ status: 404, description: 'PM task not found' })
@@ -162,6 +177,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Patch('tasks/:id')
+  @Permissions('pm_schedules:edit')
   @ApiOperation({ summary: 'Update a PM task' })
   @ApiResponse({ status: 200, description: 'PM task updated successfully' })
   @ApiResponse({ status: 404, description: 'PM task not found' })
@@ -170,6 +186,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Delete('tasks/:id')
+  @Permissions('pm_schedules:delete')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a PM task' })
   @ApiResponse({ status: 204, description: 'PM task deleted successfully' })
@@ -180,6 +197,7 @@ export class PreventiveMaintenanceController {
 
   // Meter-based and Condition-based PM endpoints
   @Post('process/meter-based')
+  @Permissions('pm_schedules:execute')
   @ApiOperation({ summary: 'Manually trigger processing of meter-based PMs' })
   @ApiResponse({
     status: 200,
@@ -197,6 +215,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Post('process/condition-based')
+  @Permissions('pm_schedules:execute')
   @ApiOperation({ summary: 'Manually trigger processing of condition-based PMs' })
   @ApiResponse({
     status: 200,
@@ -214,6 +233,7 @@ export class PreventiveMaintenanceController {
   }
 
   @Get('meter-based/approaching-due')
+  @Permissions('pm_schedules:view')
   @ApiOperation({ summary: 'Get meter-based PMs approaching their due threshold' })
   @ApiQuery({
     name: 'thresholdPercentage',
