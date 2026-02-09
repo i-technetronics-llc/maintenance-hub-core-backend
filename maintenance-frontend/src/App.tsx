@@ -220,7 +220,7 @@ function App() {
           <Route
             path="users/invite"
             element={
-              <ProtectedRoute requiredPermission="users:create">
+              <ProtectedRoute requiredPermission="user_management:create">
                 <EmployeeInvitePage />
               </ProtectedRoute>
             }
@@ -229,39 +229,75 @@ function App() {
           {/* Inventory Management */}
           <Route
             path="inventory"
-            element={<InventoryManagementPage />}
+            element={
+              <ProtectedRoute requiredPermission="inventory:view">
+                <InventoryManagementPage />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="inventory/services"
-            element={<ServicesPage />}
+            element={
+              <ProtectedRoute requiredPermission="inventory:view">
+                <ServicesPage />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="inventory/locations"
-            element={<LocationsPage />}
+            element={
+              <ProtectedRoute requiredPermission="inventory:view">
+                <LocationsPage />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="inventory/manufacturers"
-            element={<ManufacturersPage />}
+            element={
+              <ProtectedRoute requiredPermission="inventory:view">
+                <ManufacturersPage />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="inventory/suppliers"
-            element={<SuppliersPage />}
+            element={
+              <ProtectedRoute requiredPermission="inventory:view">
+                <SuppliersPage />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="inventory/categories"
-            element={<CategoriesPage />}
+            element={
+              <ProtectedRoute requiredPermission="inventory:view">
+                <CategoriesPage />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="inventory/price-books"
-            element={<PriceBookPage />}
+            element={
+              <ProtectedRoute requiredPermission="inventory:view">
+                <PriceBookPage />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="inventory/price-books/:organizationId"
-            element={<PriceBookPage />}
+            element={
+              <ProtectedRoute requiredPermission="inventory:view">
+                <PriceBookPage />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="inventory/transactions"
-            element={<InventoryTransactionsPage />}
+            element={
+              <ProtectedRoute requiredPermission="inventory:view">
+                <InventoryTransactionsPage />
+              </ProtectedRoute>
+            }
           />
 
           {/* Settings */}
@@ -276,7 +312,7 @@ function App() {
           <Route
             path="settings/users-permissions"
             element={
-              <ProtectedRoute requiredPermission="users:view">
+              <ProtectedRoute requiredPermission="user_management:view">
                 <UsersPage />
               </ProtectedRoute>
             }
@@ -288,7 +324,7 @@ function App() {
           <Route
             path="settings/organizations"
             element={
-              <ProtectedRoute requiredPermission="companies:view">
+              <ProtectedRoute requiredPermission="company_management:view">
                 <CompanyManagementPage />
               </ProtectedRoute>
             }
@@ -310,7 +346,7 @@ function App() {
           <Route
             path="management/audit-trail"
             element={
-              <ProtectedRoute superAdminOnly>
+              <ProtectedRoute requiredPermission="audit:view">
                 <AuditTrailPage />
               </ProtectedRoute>
             }
@@ -318,47 +354,222 @@ function App() {
 
           {/* Existing Routes */}
           <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="users" element={<UsersPage />} />
-          <Route path="assets" element={<AssetsPage />} />
-          <Route path="assets/:id" element={<AssetDetailPage />} />
+          <Route
+            path="users"
+            element={
+              <ProtectedRoute requiredPermission="user_management:view">
+                <UsersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="assets"
+            element={
+              <ProtectedRoute requiredPermission="asset_management:view">
+                <AssetsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="assets/:id"
+            element={
+              <ProtectedRoute requiredPermission="asset_management:view">
+                <AssetDetailPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Scanner/QR Code Route */}
-          <Route path="scanner" element={<ScannerPage />} />
+          <Route
+            path="scanner"
+            element={
+              <ProtectedRoute requiredPermission="tools:view">
+                <ScannerPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Scheduling Calendar */}
-          <Route path="scheduling" element={<SchedulingPage />} />
-          <Route path="scheduling/calendar" element={<SchedulingPage />} />
+          <Route
+            path="scheduling"
+            element={
+              <ProtectedRoute requiredPermission="scheduling:view">
+                <SchedulingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="scheduling/calendar"
+            element={
+              <ProtectedRoute requiredPermission="scheduling:view">
+                <SchedulingPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Onboarding Module */}
-          <Route path="onboarding/clients" element={<ClientsPage />} />
-          <Route path="onboarding/sites" element={<SitesPage />} />
-          <Route path="onboarding/sla" element={<SLAManagementPage />} />
-          <Route path="onboarding/price-books" element={<PriceBookPage />} />
+          <Route
+            path="onboarding/clients"
+            element={
+              <ProtectedRoute requiredPermission="client_management:view">
+                <ClientsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="onboarding/sites"
+            element={
+              <ProtectedRoute requiredPermission="client_management:view">
+                <SitesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="onboarding/sla"
+            element={
+              <ProtectedRoute requiredPermission="sla:view">
+                <SLAManagementPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="onboarding/price-books"
+            element={
+              <ProtectedRoute requiredPermission="inventory:view">
+                <PriceBookPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Teams Module */}
-          <Route path="teams" element={<TeamsPage />} />
-          <Route path="teams/visualization" element={<TeamVisualizationPage />} />
+          <Route
+            path="teams"
+            element={
+              <ProtectedRoute requiredPermission="performance:view">
+                <TeamsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="teams/visualization"
+            element={
+              <ProtectedRoute requiredPermission="performance:view">
+                <TeamVisualizationPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Finance Module */}
-          <Route path="finance" element={<FinanceDashboardPage />} />
-          <Route path="finance/invoices" element={<InvoicesPage />} />
-          <Route path="finance/purchase-orders" element={<PurchaseOrdersPage />} />
-          <Route path="finance/quotes" element={<QuotesPage />} />
-          <Route path="finance/expenses" element={<ExpensesPage />} />
-          <Route path="finance/budgets" element={<BudgetsPage />} />
+          <Route
+            path="finance"
+            element={
+              <ProtectedRoute requiredPermission="billing:view">
+                <FinanceDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="finance/invoices"
+            element={
+              <ProtectedRoute requiredPermission="billing:view">
+                <InvoicesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="finance/purchase-orders"
+            element={
+              <ProtectedRoute requiredPermission="billing:view">
+                <PurchaseOrdersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="finance/quotes"
+            element={
+              <ProtectedRoute requiredPermission="billing:view">
+                <QuotesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="finance/expenses"
+            element={
+              <ProtectedRoute requiredPermission="billing:view">
+                <ExpensesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="finance/budgets"
+            element={
+              <ProtectedRoute requiredPermission="billing:view">
+                <BudgetsPage />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="work-orders" element={<WorkOrdersPage />} />
-          <Route path="work-orders/:id" element={<WorkOrderDetailPage />} />
-          <Route path="work-orders/templates" element={<WorkOrderTemplatesPage />} />
+          <Route
+            path="work-orders"
+            element={
+              <ProtectedRoute requiredPermission="work_order_management:view">
+                <WorkOrdersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="work-orders/:id"
+            element={
+              <ProtectedRoute requiredPermission="work_order_management:view">
+                <WorkOrderDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="work-orders/templates"
+            element={
+              <ProtectedRoute requiredPermission="work_order_management:view">
+                <WorkOrderTemplatesPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="profile" element={<ProfilePage />} />
 
           {/* Preventive Maintenance */}
-          <Route path="preventive-maintenance" element={<PreventiveMaintenancePage />} />
-          <Route path="preventive-maintenance/templates" element={<WorkOrderTemplatesPage />} />
-          <Route path="preventive-maintenance/calendar" element={<PreventiveMaintenancePage />} />
+          <Route
+            path="preventive-maintenance"
+            element={
+              <ProtectedRoute requiredPermission="pm_schedules:view">
+                <PreventiveMaintenancePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="preventive-maintenance/templates"
+            element={
+              <ProtectedRoute requiredPermission="pm_schedules:view">
+                <WorkOrderTemplatesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="preventive-maintenance/calendar"
+            element={
+              <ProtectedRoute requiredPermission="pm_schedules:view">
+                <PreventiveMaintenancePage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Inventory Management */}
-          <Route path="inventory-parts" element={<InventoryPage />} />
+          <Route
+            path="inventory-parts"
+            element={
+              <ProtectedRoute requiredPermission="inventory:view">
+                <InventoryPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Billing */}
           <Route
@@ -403,17 +614,80 @@ function App() {
           />
 
           {/* Reports & Analytics */}
-          <Route path="reports" element={<ReportsPage />} />
-          <Route path="reports/builder" element={<ReportBuilderPage />} />
-          <Route path="reports/kpi" element={<KpiDashboardPage />} />
-          <Route path="reports/analytics" element={<AdvancedAnalyticsPage />} />
+          <Route
+            path="reports"
+            element={
+              <ProtectedRoute requiredPermission="reporting:view">
+                <ReportsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="reports/builder"
+            element={
+              <ProtectedRoute requiredPermission="reporting:create">
+                <ReportBuilderPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="reports/kpi"
+            element={
+              <ProtectedRoute requiredPermission="reporting:view">
+                <KpiDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="reports/analytics"
+            element={
+              <ProtectedRoute requiredPermission="analytics:view">
+                <AdvancedAnalyticsPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Analytics Dashboard Routes */}
-          <Route path="analytics/kpi" element={<KpiDashboardReportPage />} />
-          <Route path="analytics/work-orders" element={<WorkOrderReportsPage />} />
-          <Route path="analytics/assets" element={<AssetPerformancePage />} />
-          <Route path="analytics/inventory" element={<InventoryReportsPage />} />
-          <Route path="analytics/costs" element={<CostReportsPage />} />
+          <Route
+            path="analytics/kpi"
+            element={
+              <ProtectedRoute requiredPermission="analytics:view">
+                <KpiDashboardReportPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="analytics/work-orders"
+            element={
+              <ProtectedRoute requiredPermission="analytics:view">
+                <WorkOrderReportsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="analytics/assets"
+            element={
+              <ProtectedRoute requiredPermission="analytics:view">
+                <AssetPerformancePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="analytics/inventory"
+            element={
+              <ProtectedRoute requiredPermission="analytics:view">
+                <InventoryReportsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="analytics/costs"
+            element={
+              <ProtectedRoute requiredPermission="analytics:view">
+                <CostReportsPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* API & Integrations */}
           <Route path="integrations/api-keys" element={<ApiKeysPage />} />

@@ -4,6 +4,7 @@ import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { JwtAuthGuard } from '@app/common/guards';
+import { Permissions } from '@app/common/decorators';
 
 @ApiTags('organizations')
 @Controller('organizations')
@@ -13,30 +14,35 @@ export class OrganizationsController {
   constructor(private readonly organizationsService: OrganizationsService) {}
 
   @Post()
+  @Permissions('company_management:create')
   @ApiOperation({ summary: 'Create a new organization' })
   create(@Body() createOrganizationDto: CreateOrganizationDto) {
     return this.organizationsService.create(createOrganizationDto);
   }
 
   @Get()
+  @Permissions('company_management:view')
   @ApiOperation({ summary: 'Get all organizations' })
   findAll() {
     return this.organizationsService.findAll();
   }
 
   @Get(':id')
+  @Permissions('company_management:view')
   @ApiOperation({ summary: 'Get an organization by ID' })
   findOne(@Param('id') id: string) {
     return this.organizationsService.findOne(id);
   }
 
   @Patch(':id')
+  @Permissions('company_management:edit')
   @ApiOperation({ summary: 'Update an organization' })
   update(@Param('id') id: string, @Body() updateOrganizationDto: UpdateOrganizationDto) {
     return this.organizationsService.update(id, updateOrganizationDto);
   }
 
   @Delete(':id')
+  @Permissions('company_management:delete')
   @ApiOperation({ summary: 'Delete an organization' })
   remove(@Param('id') id: string) {
     return this.organizationsService.remove(id);

@@ -2,6 +2,7 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { AnalyticsService, DateRangeQuery } from './analytics.service';
 import { JwtAuthGuard } from '@app/common/guards';
+import { Permissions } from '@app/common/decorators';
 
 @ApiTags('Analytics')
 @Controller('analytics')
@@ -11,6 +12,7 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Get('dashboard')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get comprehensive dashboard analytics' })
   @ApiResponse({ status: 200, description: 'Dashboard analytics retrieved successfully' })
   async getDashboardAnalytics() {
@@ -22,6 +24,7 @@ export class AnalyticsController {
   }
 
   @Get('kpi-dashboard')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get KPI dashboard with key performance indicators' })
   @ApiQuery({ name: 'startDate', required: false, type: String, description: 'Start date (ISO format)' })
   @ApiQuery({ name: 'endDate', required: false, type: String, description: 'End date (ISO format)' })
@@ -42,6 +45,7 @@ export class AnalyticsController {
   }
 
   @Get('work-orders')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get work order statistics' })
   @ApiResponse({ status: 200, description: 'Work order statistics retrieved successfully' })
   async getWorkOrderStats() {
@@ -53,6 +57,7 @@ export class AnalyticsController {
   }
 
   @Get('work-orders/metrics')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get comprehensive work order metrics and analytics' })
   @ApiQuery({ name: 'startDate', required: false, type: String, description: 'Start date (ISO format)' })
   @ApiQuery({ name: 'endDate', required: false, type: String, description: 'End date (ISO format)' })
@@ -73,6 +78,7 @@ export class AnalyticsController {
   }
 
   @Get('work-orders/trend')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get work order trend data for charts' })
   @ApiQuery({ name: 'days', required: false, type: Number, description: 'Number of days (default: 30)' })
   @ApiResponse({ status: 200, description: 'Work order trend data retrieved successfully' })
@@ -86,6 +92,7 @@ export class AnalyticsController {
   }
 
   @Get('assets')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get asset statistics' })
   @ApiResponse({ status: 200, description: 'Asset statistics retrieved successfully' })
   async getAssetStats() {
@@ -97,6 +104,7 @@ export class AnalyticsController {
   }
 
   @Get('assets/performance')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get asset performance metrics' })
   @ApiQuery({ name: 'startDate', required: false, type: String, description: 'Start date (ISO format)' })
   @ApiQuery({ name: 'endDate', required: false, type: String, description: 'End date (ISO format)' })
@@ -117,6 +125,7 @@ export class AnalyticsController {
   }
 
   @Get('inventory')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get inventory statistics' })
   @ApiResponse({ status: 200, description: 'Inventory statistics retrieved successfully' })
   async getInventoryStats() {
@@ -128,6 +137,7 @@ export class AnalyticsController {
   }
 
   @Get('inventory/metrics')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get comprehensive inventory metrics' })
   @ApiQuery({ name: 'startDate', required: false, type: String, description: 'Start date (ISO format)' })
   @ApiQuery({ name: 'endDate', required: false, type: String, description: 'End date (ISO format)' })
@@ -148,6 +158,7 @@ export class AnalyticsController {
   }
 
   @Get('inventory/trend')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get inventory trend data by category' })
   @ApiResponse({ status: 200, description: 'Inventory trend data retrieved successfully' })
   async getInventoryTrend() {
@@ -159,6 +170,7 @@ export class AnalyticsController {
   }
 
   @Get('costs')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get cost metrics and analysis' })
   @ApiQuery({ name: 'startDate', required: false, type: String, description: 'Start date (ISO format)' })
   @ApiQuery({ name: 'endDate', required: false, type: String, description: 'End date (ISO format)' })
@@ -179,6 +191,7 @@ export class AnalyticsController {
   }
 
   @Get('technicians/productivity')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get technician productivity metrics' })
   @ApiQuery({ name: 'startDate', required: false, type: String, description: 'Start date (ISO format)' })
   @ApiQuery({ name: 'endDate', required: false, type: String, description: 'End date (ISO format)' })
@@ -199,6 +212,7 @@ export class AnalyticsController {
   }
 
   @Get('users')
+  @Permissions('analytics:view')
   @ApiOperation({ summary: 'Get user statistics' })
   @ApiResponse({ status: 200, description: 'User statistics retrieved successfully' })
   async getUserStats() {
